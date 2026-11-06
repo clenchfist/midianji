@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build": "node build.cjs",
-    "test": "node check.cjs",
+    "test": "node check.cjs && node save-check.cjs",
     "dev": "node preview.cjs"
   },
   "engines": { "node": ">=22" }

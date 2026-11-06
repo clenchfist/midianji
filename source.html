@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="description" content="离线密电机，生成随机密码本，双方导入同一密码本即可加密和解密">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-YJncQ8f+WqS+ONd/rw+uh2j2kxCsMNdO9bWqlVdfqOo=' 'sha256-hJ0fQw8XovNAc0cSjq7YPt+SeIqNhBFEXY/9BPUnAfU='; style-src 'sha256-5md/OTX4L5npoxeiWXJH4OTwZu2uU2KUc+r/JFrJK7I='; img-src data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'"><meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-YJncQ8f+WqS+ONd/rw+uh2j2kxCsMNdO9bWqlVdfqOo=' 'sha256-pbeM0LRkBnZ2Bbu5f9xzU3DoDITeHa3uhT9qfVX19YI='; style-src 'sha256-5md/OTX4L5npoxeiWXJH4OTwZu2uU2KUc+r/JFrJK7I='; img-src data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'"><meta name="referrer" content="no-referrer">
 <title>密电机</title><style>:root{color-scheme:light;--ink:#27303e;--muted:#7b8492;--line:#e4e7ec;--accent:#465f85;font-family:"SimSun","宋体","Songti SC",serif;font-synthesis:none}*{box-sizing:border-box}body{margin:0;background:#f5f6f8;color:var(--ink);font-size:15px;line-height:1.7}button,input,textarea,select{font:inherit}button{cursor:pointer}button:disabled{cursor:default;opacity:.4}button,input,textarea,select,summary{outline-offset:3px}button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,summary:focus-visible{outline:2px solid #718db2}button{transition:background .15s}.app{max-width:1000px;margin:36px auto;padding:0 28px}.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}.identity{display:flex;align-items:center;gap:11px}.app-icon{display:grid;place-items:center;width:32px;height:32px;border-radius:7px;color:#60738d;background:#e7ecf3;font-size:23px;line-height:1}h1{font-size:20px;font-weight:600;margin:0;letter-spacing:.3px}.text-button{background:transparent;border:0;color:var(--muted);font-size:14px;padding:5px;white-space:nowrap}.text-button:hover{color:var(--accent)}.credentials{background:white;border:1px solid var(--line);border-radius:10px;padding:18px 21px;margin-bottom:19px}.credential-heading{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:11px}.credential-heading label{font-size:15px;font-weight:600}.credential-heading span{font-size:14px;color:var(--muted)}.book-row{display:flex;gap:10px;align-items:center}.book-row select{flex:1;min-width:130px;width:100%;padding:9px 11px;border:1px solid #dce1e8;background:#fafbfc;border-radius:6px;color:var(--ink);font-size:14px;height:39px}.book-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}.book-note{font-size:13px;color:#718092;margin:11px 0 3px}.book-storage{font-size:13px;color:#939ba8;margin:0}.book-storage.warning{color:#9a6c32}.rename-row{display:flex;align-items:center;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid #edf0f3}.rename-row label{font-size:13px;white-space:nowrap;color:var(--muted)}.rename-row input{min-width:0;flex:1;padding:8px 10px;border:1px solid var(--line);border-radius:6px;color:var(--ink);font-size:14px}input::placeholder,textarea::placeholder{color:#a0a7b1}.editor-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.panel{background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden;min-width:0}.panel-heading{display:flex;align-items:center;justify-content:space-between;padding:15px 18px 12px;gap:10px}.panel-heading label{font-size:14px;font-weight:600}.count,.result-type{font-size:13px;color:#929baa}.panel textarea{display:block;width:100%;height:260px;min-height:160px;resize:vertical;border:0;border-top:1px solid #edf0f3;border-bottom:1px solid #edf0f3;background:#fff;padding:16px 18px;font-size:15px;line-height:1.9;color:#334054;overflow-wrap:anywhere}.panel textarea:focus-visible{outline-offset:-2px}.panel textarea[readonly]{background:#fbfcfd;font-family:Consolas,"SimSun","宋体","Songti SC",serif;font-size:14px}.panel-actions{display:flex;align-items:center;justify-content:space-between;padding:13px 15px;gap:8px;min-height:62px}.button-group{display:flex;gap:8px}.button{border:1px solid #dbe1e9;border-radius:6px;padding:8px 17px;background:#fff;color:#4b5a6e;font-size:14px;white-space:nowrap;line-height:1.6}.button:hover{background:#f2f5f9}.button.primary{background:var(--accent);border-color:var(--accent);color:white;min-width:82px}.button.primary:hover{background:#354f73}.button.subtle{background:#f9fafc;border-color:var(--line);color:#6c7889}.status{min-height:22px;margin:11px 2px 19px;color:#7b8492;font-size:13px}.status.error{color:#ad4d49}.status.success{color:#497557}.help{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:13px 2px}.help summary{list-style:none;display:flex;align-items:center;gap:10px;cursor:pointer;color:#677383;font-size:14px}.help summary:before{content:"›";display:inline-block;font-size:17px;line-height:1;transition:transform .15s}.help[open] summary:before{transform:rotate(90deg)}.help summary::-webkit-details-marker{display:none}.help-body{padding:9px 0 3px 19px;font-size:14px;line-height:1.9;color:#667181}.help-body ol{padding-left:18px;margin:3px 0 12px}.help-body p{margin:8px 0}.muted{font-size:13px;color:#939ba8}footer{display:flex;gap:12px;color:#a3abb6;font-size:13px;margin-top:20px;padding-bottom:10px}footer span:before{content:"·";margin-right:12px}.notice{font-size:14px;background:#fff;border:1px solid #e8dcda;border-radius:8px;padding:13px 16px}.hidden{display:none!important}@media(max-width:800px){.book-row{align-items:stretch;flex-direction:column}.book-actions{flex-wrap:wrap}.book-actions .button{padding:7px 14px}.credential-heading span{font-size:13px}}@media(max-width:700px){.app{padding:0 17px;margin:25px auto}.header{margin-bottom:19px}.credentials{padding:16px}.credential-heading{align-items:flex-start;flex-direction:column;gap:3px}.editor-grid{grid-template-columns:1fr;gap:15px}.panel textarea{height:210px}.button{padding:8px 14px}.status{margin-bottom:17px}.help-body{padding-left:14px}h1{font-size:19px}.rename-row{flex-wrap:wrap}.rename-row label{width:100%}.rename-row input{width:130px}}@media(prefers-reduced-motion:reduce){*{transition:none!important}}
 @media(max-width:420px){.book-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.book-actions .button{font-size:13px;padding:8px 6px}.book-actions .text-button{border:1px solid var(--line);border-radius:6px;background:#f9fafc}}
 .book-actions .book-action{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:40px;padding:7px 12px;border:1px solid var(--action-border);background:var(--action-bg);color:var(--action-ink);font-weight:500;box-shadow:0 1px 2px #27303e06;transition:background .15s,border-color .15s}
@@ -212,7 +212,7 @@ const InformationTranslator=(()=>{
 </script><script>'use strict';
 (()=>{
   const $=id=>document.getElementById(id),API=InformationTranslator,STORAGE_KEY='information-translator.books';
-  let records=[],activeId='',cached=null,busy=false,lastAction='encode',pendingDeleteId='',copyToastTimer=0,savingText=false,pendingText=null;
+  let records=[],activeId='',cached=null,busy=false,lastAction='encode',pendingDeleteId='',copyToastTimer=0,savingFile=false,pendingFile=null;
   const active=()=>records.find(record=>record.id===activeId);
   function status(text,type=''){$('status').textContent=text;$('status').className='status '+type;}
   function copied(){clearTimeout(copyToastTimer);$('copy-toast').classList.remove('hidden');copyToastTimer=setTimeout(()=>$('copy-toast').classList.add('hidden'),1000);}
@@ -220,9 +220,9 @@ const InformationTranslator=(()=>{
   function buttons(){
     for(const id of ['new-book','import-book'])$(id).disabled=busy||!API.supported();
     $('book-select').disabled=busy||!records.length;
-    for(const id of ['export-book','rename-book'])$(id).disabled=busy||!active();
+    for(const id of ['export-book','rename-book'])$(id).disabled=busy||!active()||(id==='export-book'&&savingFile);
     for(const button of $('book-list').querySelectorAll('button'))button.disabled=busy;
-    for(const id of ['copy','download-text','reverse'])$(id).disabled=busy||!$('output').value||(id==='download-text'&&savingText);
+    for(const id of ['copy','download-text','reverse'])$(id).disabled=busy||!$('output').value||(id==='download-text'&&savingFile);
   }
   function clearResult(){$('output').value='';$('result-type').textContent='';buttons();}
   function count(){$('input-count').textContent=[...$('input').value].length.toLocaleString()+' 字符';}
@@ -308,9 +308,9 @@ const InformationTranslator=(()=>{
     });
   };
   $('export-book').onclick=()=>{
-    const record=active();if(!record)return;
+    const record=active();if(!record||busy||savingFile)return;
     const filename=record.name.replace(/[<>:"/\\|?*\u0000-\u001F]/g,'_')+'.itbook';
-    download(record.raw,filename,'application/json');status('已请求下载「'+filename+'」，下次或换设备时导入这份文件即可');
+    return saveFile({text:record.raw,name:filename,type:'application/json',extension:'.itbook',description:'密码本文件',title:'导出密码本',saved:'密码本已保存',origin:'export-book',pickerId:'midianji-codebook'});
   };
   $('rename-book').onclick=()=>{if(!active())return;$('book-name').value=active().name;$('rename-row').classList.remove('hidden');$('book-name').focus();$('book-name').select();};
   $('cancel-name').onclick=()=>$('rename-row').classList.add('hidden');
@@ -364,53 +364,57 @@ const InformationTranslator=(()=>{
       if(success)copied();else status('结果已选中，请使用系统复制');
     }
   };
-  function textFilename(){
+  function saveFilename(){
     const value=$('save-name').value.trim();
     if(!value||/[<>:"/\\|?*\u0000-\u001F]/.test(value))throw new Error('请填写有效的文件名');
-    return /\.txt$/i.test(value)?value:value+'.txt';
+    return value.toLowerCase().endsWith(pendingFile.extension)?value:value+pendingFile.extension;
   }
-  function shareableFile(text,name){
-    try{if(typeof File!=='function'||typeof navigator.share!=='function'||typeof navigator.canShare!=='function')return null;const file=new File([text],name,{type:'text/plain'});return navigator.canShare({files:[file]})?file:null;}catch{return null;}
+  function shareableFile(data,name){
+    try{if(typeof File!=='function'||typeof navigator.share!=='function'||typeof navigator.canShare!=='function')return null;const file=new File([data.text],name,{type:data.type});return navigator.canShare({files:[file]})?file:null;}catch{return null;}
   }
-  function openTextSave(text,name){
-    pendingText=text;$('save-name').value=name;
-    const canShare=!!shareableFile(text,name);
+  function openFileSave(data){
+    pendingFile=data;$('save-title').textContent=data.title;$('save-name').value=data.name;
+    const canShare=!!shareableFile(data,data.name);
     $('share-file').classList.toggle('hidden',!canShare);
     $('save-description').textContent=canShare?'可选择系统保存方式，或下载到浏览器指定的位置':'保存位置由浏览器的下载设置决定';
     $('save-dialog').showModal();$('save-name').focus();$('save-name').select();
   }
   $('cancel-save').onclick=()=>$('save-dialog').close();
-  $('save-dialog').onclose=()=>{pendingText=null;$('download-text').focus();};
+  $('save-dialog').onclose=()=>{const origin=pendingFile?.origin;pendingFile=null;if(origin)$(origin).focus();};
   $('save-download').onclick=()=>{
-    if(pendingText===null)return;
-    try{download(pendingText,textFilename());$('save-dialog').close();status('已请求下载，请在浏览器的下载列表中查看');}
+    if(!pendingFile||savingFile)return;
+    try{download(pendingFile.text,saveFilename(),pendingFile.type);$('save-dialog').close();status('已请求下载，请在浏览器的下载列表中查看');}
     catch(error){$('save-description').textContent=error?.message||'无法下载文件，请重试';}
   };
   $('share-file').onclick=async()=>{
-    if(pendingText===null||savingText)return;
-    let file;try{file=shareableFile(pendingText,textFilename());}catch(error){$('save-description').textContent=error.message;return;}
+    if(!pendingFile||savingFile)return;
+    let file;try{file=shareableFile(pendingFile,saveFilename());}catch(error){$('save-description').textContent=error.message;return;}
     if(!file){$('save-description').textContent='当前浏览器无法打开系统保存菜单，请选择下载文件';return;}
-    savingText=true;$('share-file').disabled=true;$('save-download').disabled=true;buttons();
+    savingFile=true;$('share-file').disabled=true;$('save-download').disabled=true;buttons();
     try{await navigator.share({files:[file]});$('save-dialog').close();status('已交给系统处理，请确认文件已保存');}
     catch(error){if(error?.name!=='AbortError')$('save-description').textContent='无法打开系统保存菜单，请选择下载文件';}
-    finally{savingText=false;$('share-file').disabled=false;$('save-download').disabled=false;buttons();}
+    finally{savingFile=false;$('share-file').disabled=false;$('save-download').disabled=false;buttons();}
   };
-  $('download-text').onclick=async()=>{
-    const text=$('output').value;if(!text||busy||savingText)return;
-    const name=lastAction==='encode'?'加密内容.txt':'解密文字.txt';
-    if(typeof window.showSaveFilePicker!=='function'){openTextSave(text,name);return;}
-    savingText=true;buttons();let stream,selected=false;
+  async function saveFile(data){
+    if(typeof window.showSaveFilePicker!=='function'){openFileSave(data);return;}
+    savingFile=true;buttons();let stream,selected=false;
     try{
       // Open directly from the click so the browser retains user activation.
-      const handle=await window.showSaveFilePicker({id:'information-translator-text',suggestedName:name,types:[{description:'文本文件',accept:{'text/plain':['.txt']}}]});
+      const handle=await window.showSaveFilePicker({id:data.pickerId,suggestedName:data.name,types:[{description:data.description,accept:{[data.type]:[data.extension]}}]});
       selected=true;stream=await handle.createWritable();
-      await stream.write(new Blob([text],{type:'text/plain;charset=utf-8'}));await stream.close();stream=null;
-      status('文本已保存','success');
+      await stream.write(new Blob([data.text],{type:data.type+';charset=utf-8'}));await stream.close();stream=null;
+      status(data.saved,'success');
     }catch(error){
       if(stream){try{await stream.abort();}catch{}}
       if(error?.name==='AbortError'&&!selected)return;
-      status('无法保存文本，请重新选择位置或检查写入权限','error');
-    }finally{savingText=false;buttons();}
+      if(!selected&&['SecurityError','NotSupportedError'].includes(error?.name)){openFileSave(data);return;}
+      status('无法保存'+(data.extension==='.itbook'?'密码本':'文本')+'，请重新选择位置或检查写入权限','error');
+    }finally{savingFile=false;buttons();}
+  }
+  $('download-text').onclick=()=>{
+    const text=$('output').value;if(!text||busy||savingFile)return;
+    const name=lastAction==='encode'?'加密内容.txt':'解密文字.txt';
+    return saveFile({text,name,type:'text/plain',extension:'.txt',description:'文本文件',title:'保存文本',saved:'文本已保存',origin:'download-text',pickerId:'information-translator-text'});
   };
   async function load(){
     let raw;
