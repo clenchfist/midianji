@@ -1,0 +1,11 @@
+{
+  "name": "midianji",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "node build.cjs",
+    "test": "node check.cjs",
+    "dev": "node preview.cjs"
+  },
+  "engines": { "node": ">=22" }
+}
