@@ -1,72 +1,50 @@
 <!doctype html>
-<html lang="zh-CN">
-<head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="description" content="离线密电机，生成随机密码本，双方导入同一密码本即可加密和解密">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-YJncQ8f+WqS+ONd/rw+uh2j2kxCsMNdO9bWqlVdfqOo=' 'sha256-pbeM0LRkBnZ2Bbu5f9xzU3DoDITeHa3uhT9qfVX19YI='; style-src 'sha256-5md/OTX4L5npoxeiWXJH4OTwZu2uU2KUc+r/JFrJK7I='; img-src data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'"><meta name="referrer" content="no-referrer">
-<title>密电机</title><style>:root{color-scheme:light;--ink:#27303e;--muted:#7b8492;--line:#e4e7ec;--accent:#465f85;font-family:"SimSun","宋体","Songti SC",serif;font-synthesis:none}*{box-sizing:border-box}body{margin:0;background:#f5f6f8;color:var(--ink);font-size:15px;line-height:1.7}button,input,textarea,select{font:inherit}button{cursor:pointer}button:disabled{cursor:default;opacity:.4}button,input,textarea,select,summary{outline-offset:3px}button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,summary:focus-visible{outline:2px solid #718db2}button{transition:background .15s}.app{max-width:1000px;margin:36px auto;padding:0 28px}.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}.identity{display:flex;align-items:center;gap:11px}.app-icon{display:grid;place-items:center;width:32px;height:32px;border-radius:7px;color:#60738d;background:#e7ecf3;font-size:23px;line-height:1}h1{font-size:20px;font-weight:600;margin:0;letter-spacing:.3px}.text-button{background:transparent;border:0;color:var(--muted);font-size:14px;padding:5px;white-space:nowrap}.text-button:hover{color:var(--accent)}.credentials{background:white;border:1px solid var(--line);border-radius:10px;padding:18px 21px;margin-bottom:19px}.credential-heading{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:11px}.credential-heading label{font-size:15px;font-weight:600}.credential-heading span{font-size:14px;color:var(--muted)}.book-row{display:flex;gap:10px;align-items:center}.book-row select{flex:1;min-width:130px;width:100%;padding:9px 11px;border:1px solid #dce1e8;background:#fafbfc;border-radius:6px;color:var(--ink);font-size:14px;height:39px}.book-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}.book-note{font-size:13px;color:#718092;margin:11px 0 3px}.book-storage{font-size:13px;color:#939ba8;margin:0}.book-storage.warning{color:#9a6c32}.rename-row{display:flex;align-items:center;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid #edf0f3}.rename-row label{font-size:13px;white-space:nowrap;color:var(--muted)}.rename-row input{min-width:0;flex:1;padding:8px 10px;border:1px solid var(--line);border-radius:6px;color:var(--ink);font-size:14px}input::placeholder,textarea::placeholder{color:#a0a7b1}.editor-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.panel{background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden;min-width:0}.panel-heading{display:flex;align-items:center;justify-content:space-between;padding:15px 18px 12px;gap:10px}.panel-heading label{font-size:14px;font-weight:600}.count,.result-type{font-size:13px;color:#929baa}.panel textarea{display:block;width:100%;height:260px;min-height:160px;resize:vertical;border:0;border-top:1px solid #edf0f3;border-bottom:1px solid #edf0f3;background:#fff;padding:16px 18px;font-size:15px;line-height:1.9;color:#334054;overflow-wrap:anywhere}.panel textarea:focus-visible{outline-offset:-2px}.panel textarea[readonly]{background:#fbfcfd;font-family:Consolas,"SimSun","宋体","Songti SC",serif;font-size:14px}.panel-actions{display:flex;align-items:center;justify-content:space-between;padding:13px 15px;gap:8px;min-height:62px}.button-group{display:flex;gap:8px}.button{border:1px solid #dbe1e9;border-radius:6px;padding:8px 17px;background:#fff;color:#4b5a6e;font-size:14px;white-space:nowrap;line-height:1.6}.button:hover{background:#f2f5f9}.button.primary{background:var(--accent);border-color:var(--accent);color:white;min-width:82px}.button.primary:hover{background:#354f73}.button.subtle{background:#f9fafc;border-color:var(--line);color:#6c7889}.status{min-height:22px;margin:11px 2px 19px;color:#7b8492;font-size:13px}.status.error{color:#ad4d49}.status.success{color:#497557}.help{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:13px 2px}.help summary{list-style:none;display:flex;align-items:center;gap:10px;cursor:pointer;color:#677383;font-size:14px}.help summary:before{content:"›";display:inline-block;font-size:17px;line-height:1;transition:transform .15s}.help[open] summary:before{transform:rotate(90deg)}.help summary::-webkit-details-marker{display:none}.help-body{padding:9px 0 3px 19px;font-size:14px;line-height:1.9;color:#667181}.help-body ol{padding-left:18px;margin:3px 0 12px}.help-body p{margin:8px 0}.muted{font-size:13px;color:#939ba8}footer{display:flex;gap:12px;color:#a3abb6;font-size:13px;margin-top:20px;padding-bottom:10px}footer span:before{content:"·";margin-right:12px}.notice{font-size:14px;background:#fff;border:1px solid #e8dcda;border-radius:8px;padding:13px 16px}.hidden{display:none!important}@media(max-width:800px){.book-row{align-items:stretch;flex-direction:column}.book-actions{flex-wrap:wrap}.book-actions .button{padding:7px 14px}.credential-heading span{font-size:13px}}@media(max-width:700px){.app{padding:0 17px;margin:25px auto}.header{margin-bottom:19px}.credentials{padding:16px}.credential-heading{align-items:flex-start;flex-direction:column;gap:3px}.editor-grid{grid-template-columns:1fr;gap:15px}.panel textarea{height:210px}.button{padding:8px 14px}.status{margin-bottom:17px}.help-body{padding-left:14px}h1{font-size:19px}.rename-row{flex-wrap:wrap}.rename-row label{width:100%}.rename-row input{width:130px}}@media(prefers-reduced-motion:reduce){*{transition:none!important}}
-@media(max-width:420px){.book-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.book-actions .button{font-size:13px;padding:8px 6px}.book-actions .text-button{border:1px solid var(--line);border-radius:6px;background:#f9fafc}}
-.book-actions .book-action{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:40px;padding:7px 12px;border:1px solid var(--action-border);background:var(--action-bg);color:var(--action-ink);font-weight:500;box-shadow:0 1px 2px #27303e06;transition:background .15s,border-color .15s}
-.book-actions .book-action svg{display:block;flex:0 0 16px;width:16px;height:16px;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
-.book-actions .book-action:hover:not(:disabled){background:var(--action-hover);border-color:var(--action-hover-border,var(--action-border))}
-#new-book{--action-bg:#536d91;--action-border:#536d91;--action-ink:#fff;--action-hover:#435c7e;--action-hover-border:#435c7e}
-#import-book{--action-bg:#eaf3ef;--action-border:#cee0d7;--action-ink:#386651;--action-hover:#dcece3;--action-hover-border:#b8d1c3}
-#export-book{--action-bg:#f8f0e4;--action-border:#eadbc1;--action-ink:#82602e;--action-hover:#f1e5d1;--action-hover-border:#dcc7a4}
-#rename-book{--action-bg:#f0edf7;--action-border:#ded6ec;--action-ink:#70558b;--action-hover:#e6e0f1;--action-hover-border:#cbbdde}
-@media(max-width:420px){.book-actions .book-action{padding:7px 6px;gap:5px}.book-actions .book-action svg{flex-basis:14px;width:14px;height:14px}}
-.delete-button{color:#a05b53}.delete-button:hover{color:#874138}dialog{width:min(400px,calc(100vw - 36px));border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);padding:23px;box-shadow:0 15px 65px #27303e20}dialog::backdrop{background:#26324365}dialog h2{font-size:17px;margin:0 0 12px}dialog p{font-size:14px;color:#6e7886;line-height:1.9;margin:0}.dialog-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:21px}.button.danger{background:#a05b53;border-color:#a05b53;color:#fff}.button.danger:hover{background:#874138}@media(max-width:420px){.book-actions .delete-button{grid-column:1/-1}}
-.credential-heading .field-heading{font-size:15px;font-weight:600;color:var(--ink)}.book-picker{position:relative;flex:1;min-width:130px;width:100%}.book-select{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;height:43px;padding:9px 11px;border:1px solid #dce1e8;background:#fafbfc;border-radius:6px;color:var(--ink);font-size:14px;text-align:left}.book-select #book-selected-name{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.book-caret{display:grid;place-items:center;flex:0 0 22px;width:22px;height:22px;color:#7b8492;line-height:0;transform-origin:center;transition:transform .18s ease,color .15s ease}.book-caret svg{display:block;width:18px;height:18px}.book-select:hover .book-caret{color:#465f85}.book-select[aria-expanded=true] .book-caret{transform:rotate(180deg);color:#465f85}.book-select[aria-expanded=true]{border-color:#839ab8}.book-list{position:absolute;z-index:20;top:calc(100% + 6px);left:0;width:100%;max-height:260px;overflow-y:auto;border:1px solid #dce1e8;background:#fff;border-radius:7px;padding:5px;box-shadow:0 8px 24px #27303e1c}.book-item{display:flex;align-items:center;gap:8px;border-radius:4px;padding:3px 5px}.book-item:hover{background:#f5f7fa}.book-item.is-current{background:#edf2f8}.book-choice{flex:1;min-width:0;background:transparent;border:0;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:8px 5px;font-size:14px;color:var(--ink)}.book-remove{flex-shrink:0;border:1px solid #b65d55;border-radius:4px;background:#b65d55;color:#fff;padding:4px 10px;font-size:13px;line-height:1.5}.book-remove:hover{background:#9c4b44;border-color:#9c4b44}.translate-actions .button-group{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));flex:1;min-width:0}.translate-actions .button-group .button{width:100%;min-width:0;height:42px;padding:0 7px;display:inline-flex;align-items:center;justify-content:center}.button.decode-action{background:#4d7d68;border-color:#4d7d68;color:#fff}.button.decode-action:hover{background:#3d6856;border-color:#3d6856}@media(max-width:360px){.translate-actions{flex-wrap:wrap}.translate-actions .button-group{flex-basis:100%}.translate-actions>.text-button{margin-left:auto}}
-
-@media(max-width:420px){.book-actions{grid-template-columns:repeat(3,minmax(0,1fr))}.book-actions #new-book{grid-column:1/-1}.book-actions .book-action{padding:7px 5px}.book-actions .book-action svg{flex-basis:14px;width:14px;height:14px}.panel-actions{flex-wrap:wrap}.panel-actions>.text-button{margin-left:auto}}
-.copy-toast{position:fixed;z-index:1000;left:50%;bottom:32px;transform:translateX(-50%);display:flex;align-items:center;gap:8px;max-width:calc(100vw - 32px);padding:10px 18px;border:1px solid #476858;border-radius:8px;background:#365744;color:#fff;box-shadow:0 5px 20px #27303e24;font-size:14px;line-height:1.5;pointer-events:none}
-.copy-toast svg{width:17px;height:17px;flex-shrink:0;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.save-label{display:block;margin-top:16px;margin-bottom:6px;font-size:14px;color:var(--ink)}.save-name{display:block;width:100%;min-width:0;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:#fafbfc;color:var(--ink);font-size:14px}.save-actions{flex-wrap:wrap}.save-actions .button{padding-left:12px;padding-right:12px}
-@supports(-webkit-touch-callout:none){.rename-row input,.save-name,.panel textarea,.panel textarea[readonly]{font-size:16px}}
-@media(pointer:coarse){.book-actions .book-action,.book-select,.button,.translate-actions .button-group .button{min-height:44px}.book-choice{min-height:44px}.book-remove{min-height:36px}}
-</style>
-</head>
-<body>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="密电机，本机生成密码本，手动导入后加密与解密">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-YJncQ8f+WqS+ONd/rw+uh2j2kxCsMNdO9bWqlVdfqOo=' 'sha256-PpW2TGwGqzjD66INWOw1sZlNvxXKzKTYSVNr5pJVBFU='; style-src 'sha256-CEC6phMl1xHUmaXnDpTcw8gVo7XVzpn23PX5YFa5PMw='; img-src data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'"><meta name="referrer" content="no-referrer">
+<title>密电机</title><style>:root{color-scheme:light;--ink:#2b3844;--muted:#707d89;--line:#d3dae1;--accent:#506982;font-family:"SimSun","宋体","Songti SC",STSong,serif;font-synthesis:none}
+*{box-sizing:border-box}body{margin:0;background:#f2f4f6;color:var(--ink);font-size:15px;line-height:1.5}button,input,textarea,select{font:inherit}button{cursor:pointer}button:disabled{cursor:default;opacity:.43}button,input,textarea,summary{outline-offset:3px}button:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-visible{outline:2px solid #7992a9}.hidden{display:none!important}
+.app{width:min(100%,1368px);height:100dvh;min-height:520px;margin:0 auto;padding:12px 24px 8px;display:flex;flex-direction:column;gap:12px}.header{display:flex;align-items:center;flex:none;height:30px}.identity{display:flex;align-items:center;gap:14px}.app-icon{display:grid;place-items:center;width:28px;height:28px;border-radius:7px;color:#587088;background:#dfe7ef;font-size:24px;line-height:1}h1{font-size:21px;font-weight:600;margin:0}.credentials{flex:none;background:#f1efeb;border:1px solid #d8d1c7;border-radius:10px;padding:8px 16px 12px}.credential-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:7px}.field-heading{font-size:17px;font-weight:600;color:#43596f}.book-row{display:flex;align-items:center;justify-content:space-between;gap:12px 16px;flex-wrap:wrap}.book-picker{position:relative;flex:0 1 auto;width:280px;max-width:100%;min-width:0}.book-select{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;height:34px;padding:3px 12px;border:1px solid #bccaD8;background:#fbfcfe;border-radius:6px;color:var(--ink);font-size:15px;text-align:left}.book-select #book-selected-name{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.book-caret{display:grid;place-items:center;flex:0 0 20px;width:20px;height:20px;color:#677a8c;line-height:0}.book-caret svg{display:block;width:18px;height:18px}.book-select[aria-expanded=true] .book-caret{transform:rotate(180deg)}.book-list{position:absolute;z-index:20;top:calc(100% + 5px);left:0;width:max(100%,280px);max-width:calc(100vw - 64px);max-height:260px;overflow:auto;border:1px solid #bccad8;background:#fff;border-radius:7px;padding:5px;box-shadow:0 6px 20px #27303e18}.book-item{display:flex;align-items:center;gap:8px;border-radius:4px;padding:3px 5px}.book-item:hover{background:#f5f7fa}.book-item.is-current{background:#edf2f8}.book-choice{flex:1;min-width:0;background:transparent;border:0;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:7px 5px;font-size:15px;color:var(--ink)}.book-remove{flex-shrink:0;border:1px solid #a5635c;border-radius:4px;background:#a5635c;color:#fff;padding:3px 9px;font-size:14px}.book-remove:hover{background:#8f514a}.book-actions{display:flex;gap:8px;flex:none}.book-actions .button{height:34px;padding:3px 12px}.book-actions #new-book{width:144px;background:#506982;border-color:#506982;color:#fff}.book-actions #import-book{width:116px;background:#e2ece6;border-color:#c1d3c9;color:#3f5d4d}.book-actions #rename-book{width:88px;background:#e9e5ef;border-color:#d3c9de;color:#665778}
+.rename-row{display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid #d8d1c7}.rename-row label{white-space:nowrap;color:var(--muted)}.rename-row input,.save-name{min-width:0;flex:1;padding:6px 9px;border:1px solid var(--line);border-radius:6px;color:var(--ink);background:#fff}.rename-row .button{height:32px;padding:3px 12px}
+.editor-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;flex:1;min-height:180px}.panel{display:flex;flex-direction:column;border:1px solid #c0cfdc;border-radius:10px;background:#eff4f9;min-width:0;min-height:0;padding:0 14px}.panel.result-panel{background:#f0f5f1;border-color:#c2d2c7}.panel-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;flex:none;height:40px;padding:5px 4px}.panel-heading label{font-size:17px;font-weight:600;color:#43596f}.result-panel .panel-heading label{color:#415e4d}.count,.result-type{font-size:15px;color:#7b8a97}.panel textarea{display:block;flex:1;width:100%;height:100%;min-height:64px;resize:none;margin:0;border:1px solid #d1dde7;border-radius:5px;background:#fdfeff;padding:3px 8px;color:var(--ink);font-family:"SimSun","宋体","Songti SC",STSong,serif;font-size:17px;font-weight:400;line-height:21px;letter-spacing:normal;overflow:auto;overflow-wrap:anywhere;scroll-behavior:auto;overscroll-behavior:contain;overflow-anchor:none}.result-panel textarea{background:#fdfefc;border-color:#d3dfd6}.panel textarea:focus-visible{outline-offset:-2px}.panel-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:center;gap:10px;flex:none;height:56px;padding:10px 0 12px}.button{display:inline-flex;align-items:center;justify-content:center;height:32px;border:1px solid #c7d3de;border-radius:6px;padding:3px 12px;background:#fafcfe;color:#495e74;font-size:15px;line-height:1.4;white-space:nowrap}.button:hover:not(:disabled){filter:brightness(.97)}.button.primary{background:#506982;border-color:#506982;color:#fff}.button.decode-action{background:#527463;border-color:#527463;color:#fff}.button.neutral{background:#ede9e4;border-color:#d7d0c7;color:#6e6252}.button.soft-green{background:#ebf2ed;border-color:#c7d7cc;color:#4c6554}.text-button{background:transparent;border:0;color:var(--muted);font-size:15px;padding:3px;cursor:pointer}.status{flex:none;min-height:20px;margin:0 2px;color:#7b8492;font-size:15px}.status.error{color:#ad4d49}.status.success{color:#497557}.help{flex:none;border-top:1px solid var(--line);padding:0 2px}.help summary{list-style:none;display:flex;align-items:center;gap:10px;height:26px;cursor:pointer;color:#687785;font-size:15px}.help summary:before{content:"›";font-size:21px;line-height:1}.help[open] summary:before{transform:rotate(90deg)}.help summary::-webkit-details-marker{display:none}.help-body{padding:4px 0 0 18px;font-size:15px;line-height:21px;color:#667181}.help-body p{margin:3px 0}footer{display:flex;gap:12px;flex:none;color:#8b97a2;font-size:15px;min-height:20px;margin-top:0}footer span:before{content:"·";margin-right:12px}.notice{flex:none;font-size:15px;background:#fff;border:1px solid #e8dcda;border-radius:8px;padding:10px 14px;margin:0}
+dialog{width:min(440px,calc(100vw - 32px));max-height:calc(100dvh - 32px);overflow:auto;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);padding:20px;box-shadow:0 15px 65px #27303e20}dialog::backdrop{background:#26324365}dialog h2{font-size:18px;margin:0 0 12px}dialog p{font-size:15px;color:#6e7886;line-height:1.6;margin:0}.dialog-actions{display:flex;justify-content:flex-end;gap:9px;flex-wrap:wrap;margin-top:18px}.button.danger{background:#a5635c;border-color:#a5635c;color:#fff}.save-label{display:block;margin:14px 0 6px}.save-name{display:block;width:100%}.copy-toast{position:fixed;z-index:1000;left:50%;bottom:28px;transform:translateX(-50%);padding:8px 18px;border:1px solid #476858;border-radius:7px;background:#405d4c;color:white;box-shadow:0 4px 18px #27303e20;font-size:15px;pointer-events:none}.legacy-list{display:grid;gap:10px;margin-top:14px}.legacy-item{display:grid;grid-template-columns:1fr auto;gap:7px;padding:10px;border:1px solid var(--line);border-radius:6px}.legacy-name{grid-column:1/-1;overflow-wrap:anywhere}.legacy-item .button{font-size:14px;padding:3px 8px}.legacy-state{font-size:14px;color:var(--muted)}.legacy-state.done{color:#497557}
+@media(max-height:620px) and (min-width:761px){.app{gap:8px;padding-top:8px;padding-bottom:6px}.header{height:28px}.credentials{padding-top:6px;padding-bottom:8px}.panel-actions{height:50px}.panel-heading{height:36px}.help-body{font-size:14px;line-height:19px}}
+@media(max-width:760px){.app{height:auto;min-height:100dvh;padding:14px 16px 10px;gap:12px}.editor-grid{grid-template-columns:1fr;gap:14px;flex:none}.panel{min-height:320px}.panel textarea{height:230px;flex:none}.book-picker{width:100%!important}.book-actions{width:100%;display:grid;grid-template-columns:1.4fr 1.15fr .85fr;gap:8px}.book-actions .button{width:100%!important;padding:3px 6px}.book-list{max-width:calc(100vw - 64px)}.credentials{padding:9px 12px 12px}.panel-actions{gap:8px}.panel-actions .button{padding:3px 5px}.rename-row{flex-wrap:wrap}.rename-row label{width:100%}.rename-row input{width:120px}.help-body{padding-left:14px}footer{flex-wrap:wrap;gap:3px 12px}}
+@media(pointer:coarse){.button,.book-select,.book-choice,.help summary{min-height:44px}.book-actions .button{height:44px}.panel-actions{height:64px}.book-remove{min-height:36px}.credential-heading{margin-bottom:9px}.rename-row input,.save-name{font-size:16px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style></head><body>
 <main class="app">
-  <header class="header"><div class="identity"><span class="app-icon" aria-hidden="true">⇄</span><h1>密电机</h1></div></header>
-  <noscript><p class="notice error">请允许此文件运行 JavaScript，才能使用加密功能</p></noscript>
-  <p id="compat" class="notice error hidden" role="alert">当前环境不支持此工具，请用新版 Safari、Edge、Chrome 或 Firefox 打开 HTML 文件</p>
-  <section class="credentials" aria-labelledby="book-heading">
-    <div class="credential-heading"><span class="field-heading" id="book-heading">当前密码本</span><span>双方导入同一密码本件即可使用</span></div>
-    <div class="book-row"><div class="book-picker" id="book-picker"><button class="book-select" id="book-select" type="button" aria-labelledby="book-heading book-selected-name" aria-describedby="book-note" aria-expanded="false" aria-controls="book-list" disabled><span id="book-selected-name">尚未选择密码本</span><span class="book-caret" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button><div class="book-list hidden" id="book-list" role="group" aria-label="密码本列表"></div></div>
-      <div class="book-actions">
-        <button class="button book-action" id="new-book"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 4v12M4 10h12"/></svg><span>生成新的密码本</span></button>
-        <button class="button book-action" id="import-book"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 3v9m-3-3 3 3 3-3M4 12v4h12v-4"/></svg><span>导入</span></button>
-        <button class="button book-action" id="export-book" disabled><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 12V3M7 6l3-3 3 3M4 12v4h12v-4"/></svg><span>导出</span></button>
-        <button class="button book-action" id="rename-book" disabled><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m12.5 4.5 3 3M4 16l3.5-.5L16 7a2.12 2.12 0 0 0-3-3l-8.5 8.5L4 16Z"/></svg><span>重命名</span></button>
-      </div>
-    </div>
-    <input type="file" id="book-file" class="hidden" aria-label="选择密码本文件">
-    <div class="rename-row hidden" id="rename-row"><label for="book-name">密码本名称</label><input id="book-name" maxlength="80" placeholder="例如：和朋友共用" autocomplete="off"><button class="button" id="save-name">保存</button><button class="text-button" id="cancel-name">取消</button></div>
-    <p class="book-note" id="book-note">请先生成、导入或手动选择密码本，再处理内容</p>
-    <p class="book-storage" id="book-storage">生成和导入的密码本会自动保存在当前浏览器，请导出一份文件备份</p>
-  </section>
-  <div class="editor-grid">
-    <section class="panel" aria-labelledby="input-label">
-      <div class="panel-heading"><label for="input" id="input-label">待处理内容</label><span class="count" id="input-count">0 字符</span></div>
-      <textarea id="input" placeholder="发消息：输入原文，然后点“信息加密”&#10;&#10;收消息：粘贴对方发来的内容，然后点“密文翻译”" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea>
-      <div class="panel-actions translate-actions"><div class="button-group"><button class="button primary" id="encode">信息加密</button><button class="button decode-action" id="decode">密文翻译</button></div><button class="text-button" id="clear-text">清空内容</button></div>
-    </section>
-    <section class="panel" aria-labelledby="output-label">
-      <div class="panel-heading"><label for="output" id="output-label">处理结果</label><span class="result-type" id="result-type"></span></div>
-      <textarea id="output" readonly placeholder="结果显示在这里" spellcheck="false"></textarea>
-      <div class="panel-actions"><div class="button-group"><button class="button" id="copy" disabled>复制结果</button><button class="button subtle" id="download-text" disabled>下载文本</button></div><button class="text-button" id="reverse" disabled>反向处理</button></div>
-    </section>
-  </div>
-  <p class="status" id="status" role="status" aria-live="polite">先生成或导入密码本，再输入内容</p>
-  <details class="help" id="help"><summary>使用说明</summary><div class="help-body">
+<header class="header"><div class="identity"><span class="app-icon" aria-hidden="true">⇄</span><h1>密电机</h1></div></header>
+<noscript><p class="notice">请允许此文件运行 JavaScript，才能使用加密功能</p></noscript>
+<p id="compat" class="notice hidden" role="alert">当前环境不支持此工具，请用新版 Safari、Edge、Chrome 或 Firefox 打开</p>
+<section class="credentials" aria-labelledby="book-heading">
+<div class="credential-heading"><span class="field-heading" id="book-heading">当前密码本</span><button class="text-button hidden" id="legacy-open" type="button">处理旧记录</button></div>
+<div class="book-row"><div class="book-picker" id="book-picker">
+<button class="book-select" id="book-select" type="button" aria-labelledby="book-heading book-selected-name" aria-expanded="false" aria-controls="book-list" disabled><span id="book-selected-name">尚未选择密码本</span><span class="book-caret" aria-hidden="true"><svg viewBox="0 0 20 20" fill="none"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
+<div class="book-list hidden" id="book-list" role="group" aria-label="密码本列表"></div></div>
+<div class="book-actions"><button class="button" id="new-book" type="button">生成新密码本</button><button class="button" id="import-book" type="button">导入密码本</button><button class="button" id="rename-book" type="button" disabled>重命名</button></div></div>
+<input type="file" id="book-file" class="hidden" aria-label="选择密码本文件">
+<div class="rename-row hidden" id="rename-row"><label for="book-name">密码本名称</label><input id="book-name" maxlength="80" autocomplete="off"><button class="button" id="rename-confirm" type="button">保存</button><button class="button neutral" id="cancel-name" type="button">取消</button></div>
+</section>
+<div class="editor-grid">
+<section class="panel" aria-labelledby="input-label"><div class="panel-heading"><label for="input" id="input-label">待处理内容</label><span class="count" id="input-count">0 字符</span></div>
+<textarea id="input" spellcheck="false" autocomplete="off" autocapitalize="off" autocorrect="off" aria-label="待处理内容"></textarea>
+<div class="panel-actions"><button class="button primary" id="encode" type="button">信息加密</button><button class="button decode-action" id="decode" type="button">密文翻译</button><button class="button neutral" id="clear-text" type="button">清空内容</button></div></section>
+<section class="panel result-panel" aria-labelledby="output-label"><div class="panel-heading"><label for="output" id="output-label">处理结果</label><span class="result-type" id="result-type"></span></div>
+<textarea id="output" readonly spellcheck="false" autocomplete="off" autocapitalize="off" autocorrect="off" aria-label="处理结果"></textarea>
+<div class="panel-actions"><button class="button" id="copy" type="button" disabled>复制结果</button><button class="button soft-green" id="download-text" type="button" disabled>下载文本</button><button class="button neutral" id="reverse" type="button" disabled>反向处理</button></div></section>
+</div>
+<p class="status" id="status" role="status" aria-live="polite"></p>
+<details class="help" id="help"><summary>使用说明</summary><div class="help-body">
     <p>请单独妥善保管密码本，不要与密文一同公开，任何持有同一份密码本的人都可以加密和解密</p>
     <p>支持简繁体、生僻字、简单图形符号，单条原文最多 20,000 字符，一个普通汉字、英文字母、数字、标点或空格＝1字符</p>
   </div></details>
-  <footer>离线运行<span>内容只在本页处理</span></footer>
+<footer>离线运行<span>内容只在本机处理</span></footer>
 </main>
-<div class="copy-toast hidden" id="copy-toast" role="status" aria-live="polite" aria-atomic="true"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m4 10 4 4 8-8"/></svg><span>已复制</span></div>
-<dialog id="save-dialog" aria-labelledby="save-title" aria-describedby="save-description"><h2 id="save-title">保存文本</h2><p id="save-description">保存位置由浏览器的下载设置决定</p><label class="save-label" for="save-name">文件名</label><input class="save-name" id="save-name" maxlength="120" autocomplete="off"><div class="dialog-actions save-actions"><button class="button subtle" id="cancel-save">取消</button><button class="button subtle hidden" id="share-file">选择保存方式</button><button class="button primary" id="save-download">下载文件</button></div></dialog>
-<dialog id="delete-dialog" aria-labelledby="delete-title" aria-describedby="delete-description"><h2 id="delete-title">删除记录</h2><p id="delete-description"></p><div class="dialog-actions"><button class="button" id="cancel-delete">取消</button><button class="button danger" id="confirm-delete">确认删除</button></div></dialog>
+<div class="copy-toast hidden" id="copy-toast" role="status" aria-live="polite">已复制</div>
+<dialog id="save-dialog" aria-labelledby="save-title" aria-describedby="save-description"><h2 id="save-title">保存文本</h2><p id="save-description"></p><label class="save-label" for="save-name">文件名</label><input class="save-name" id="save-name" maxlength="120" autocomplete="off"><div class="dialog-actions"><button class="button neutral" id="cancel-save" type="button">取消</button><button class="button hidden" id="share-file" type="button">选择保存方式</button><button class="button primary" id="save-download" type="button">下载文件</button></div></dialog>
+<dialog id="delete-dialog" aria-labelledby="delete-title"><h2 id="delete-title">删除记录</h2><p id="delete-description"></p><div class="dialog-actions"><button class="button" id="cancel-delete" type="button">取消</button><button class="button danger" id="confirm-delete" type="button">删除</button></div></dialog>
+<dialog id="legacy-dialog" aria-labelledby="legacy-title"><h2 id="legacy-title">迁移旧密码本</h2><p id="legacy-description"></p><div id="legacy-list" class="legacy-list"></div><input type="file" id="legacy-file" class="hidden" aria-label="选择旧密码本文件核对"><div class="dialog-actions"><button class="button" id="legacy-later" type="button">稍后处理</button><button class="button primary" id="legacy-clear" type="button" disabled>清除已核对的旧记录</button></div></dialog>
 <script id="translator-core">'use strict';
 const InformationTranslator=(()=>{
   const COUNT=0x110000-0x800,MAX_CHARS=20000;
@@ -209,233 +187,246 @@ const InformationTranslator=(()=>{
   }
   return {Book,COUNT,MAX_CHARS,supported,inspect,isMessage};
 })();
-</script><script>'use strict';
+</script><script id="translator-app">'use strict';
 (()=>{
-  const $=id=>document.getElementById(id),API=InformationTranslator,STORAGE_KEY='information-translator.books';
-  let records=[],activeId='',cached=null,busy=false,lastAction='encode',pendingDeleteId='',copyToastTimer=0,savingFile=false,pendingFile=null;
+  const $=id=>document.getElementById(id),API=InformationTranslator,LEGACY_KEY='information-translator.books';
+  let records=[],activeId='',cached=null,busy=false,copyTimer=0,lastAction='encode',pendingDelete='',pendingFile=null,savingFile=false;
+  let legacy=null,legacyVerifyId='',epoch=0;
   const active=()=>records.find(record=>record.id===activeId);
-  function status(text,type=''){$('status').textContent=text;$('status').className='status '+type;}
-  function copied(){clearTimeout(copyToastTimer);$('copy-toast').classList.remove('hidden');copyToastTimer=setTimeout(()=>$('copy-toast').classList.add('hidden'),1000);}
+  const canChooseSave=()=>typeof window.showSaveFilePicker==='function';
+  const sameBook=(a,b)=>a.id===b.id&&a.seed===b.seed;
+  function current(token){if(token!==epoch)throw Object.assign(new Error('操作已取消'),{name:'AbortError'});}
+  const status=(text,type='')=>{$('status').textContent=text;$('status').className='status '+type;};
   function dropCache(){cached?.destroy();cached=null;}
   function buttons(){
     for(const id of ['new-book','import-book'])$(id).disabled=busy||!API.supported();
-    $('book-select').disabled=busy||!records.length;
-    for(const id of ['export-book','rename-book'])$(id).disabled=busy||!active()||(id==='export-book'&&savingFile);
+    $('book-select').disabled=busy||!records.length;$('rename-book').disabled=busy||!active();
+    for(const id of ['copy','download-text','reverse'])$(id).disabled=busy||savingFile||!$('output').value;
     for(const button of $('book-list').querySelectorAll('button'))button.disabled=busy;
-    for(const id of ['copy','download-text','reverse'])$(id).disabled=busy||!$('output').value||(id==='download-text'&&savingFile);
+    for(const id of ['encode','decode','clear-text','rename-confirm','cancel-name'])$(id).disabled=busy||!API.supported();
+    $('input').readOnly=busy;$('book-name').disabled=busy;
+    for(const button of $('legacy-list').querySelectorAll('button'))button.disabled=busy;
+    $('legacy-clear').disabled=busy||!legacy?.entries.length||legacy.entries.some(item=>!item.verified);
+    $('legacy-open').classList.toggle('hidden',!legacy);
   }
-  function clearResult(){$('output').value='';$('result-type').textContent='';buttons();}
-  function count(){$('input-count').textContent=[...$('input').value].length.toLocaleString()+' 字符';}
   function closeBookMenu(focus=false){$('book-list').classList.add('hidden');$('book-select').setAttribute('aria-expanded','false');if(focus)$('book-select').focus();}
-  function openBookMenu(focus=false,last=false){
-    if(busy||!records.length)return;$('book-list').classList.remove('hidden');$('book-select').setAttribute('aria-expanded','true');
-    if(focus){const choices=Array.from($('book-list').querySelectorAll('.book-choice')),current=choices.find(button=>button.dataset.bookId===activeId);(last?choices[choices.length-1]:current||choices[0])?.focus();}
-  }
-  async function chooseBook(id){
-    if(busy)return;closeBookMenu();clearResult();
-    await task('正在切换密码本……',async()=>{await selectBook(id);status('已选用「'+active().name+'」','success');});
-    $('book-select').focus();
-  }
   function renderBooks(){
     const list=$('book-list');list.replaceChildren();
-    $('book-selected-name').textContent=active()?.name||(records.length?'请导入或手动选择密码本':'尚未选择密码本');$('book-select').dataset.bookId=activeId;
+    const name=active()?.name||'尚未选择密码本';$('book-selected-name').textContent=name;$('book-select').title=name;
+    $('book-picker').style.width=Math.min(900,Math.max(280,[...name].length*15+52))+'px';
     for(const record of records){
       const row=document.createElement('div'),choice=document.createElement('button'),remove=document.createElement('button');
-      row.className='book-item'+(record.id===activeId?' is-current':'');row.dataset.bookId=record.id;
-      choice.type='button';choice.className='book-choice';choice.textContent=record.name;choice.title=record.name;choice.dataset.bookId=record.id;choice.setAttribute('aria-pressed',String(record.id===activeId));choice.onclick=()=>chooseBook(record.id);
-      remove.type='button';remove.className='book-remove';remove.textContent='删除';remove.dataset.bookId=record.id;remove.setAttribute('aria-label','删除「'+record.name+'」');remove.onclick=()=>requestDelete(record.id);
+      row.className='book-item'+(record.id===activeId?' is-current':'');
+      choice.type=remove.type='button';choice.className='book-choice';choice.textContent=record.name;choice.title=record.name;choice.dataset.bookId=record.id;
+      choice.setAttribute('aria-pressed',String(record.id===activeId));choice.onclick=()=>task('正在选择密码本',async()=>{await selectBook(record.id);status('密码本已选择','success');});
+      remove.className='book-remove';remove.textContent='删除';remove.setAttribute('aria-label','删除「'+record.name+'」');remove.onclick=()=>requestDelete(record.id);
       row.append(choice,remove);list.append(row);
     }
-    if(!records.length)closeBookMenu();
-    $('book-note').textContent=active()?'加密和解密只使用当前密码本，请确认选择正确':'请先生成、导入或手动选择密码本，再处理内容';
-    buttons();
+    if(!records.length)closeBookMenu();buttons();
   }
-  function persist(nextRecords=records){
-    try{
-      if(nextRecords.length)localStorage.setItem(STORAGE_KEY,JSON.stringify({v:1,files:nextRecords.map(record=>record.raw)}));
-      else localStorage.removeItem(STORAGE_KEY);
-      $('book-storage').textContent=nextRecords.length?'已保存在当前浏览器，下次请手动选择或导入':'本机记录已清空，请生成或导入密码本';$('book-storage').classList.remove('warning');return true;
-    }catch{$('book-storage').textContent='此环境无法自动保存密码本，请务必导出文件，下次再导入';$('book-storage').classList.add('warning');return false;}
-  }
+  function count(){$('input-count').textContent=[...$('input').value].length.toLocaleString()+' 字符';}
+  function clearResult(){$('output').value='';$('result-type').textContent='';buttons();}
   async function task(text,action){
-    if(busy)return;closeBookMenu();busy=true;const states=new Map();
-    for(const el of document.querySelectorAll('button,input,textarea,select')){states.set(el,el.disabled);el.disabled=true;}
-    status(text);
-    try{await new Promise(resolve=>requestAnimationFrame(()=>setTimeout(resolve,0)));await action();}
-    catch(error){status(error?.message||'操作未完成，请重试','error');}
-    finally{busy=false;for(const [el,value]of states)el.disabled=value;renderBooks();}
+    if(busy)return;const token=epoch,previous=$('status').textContent;closeBookMenu();busy=true;buttons();status(text);
+    try{await action(token);}catch(error){if(token===epoch){if(error?.name!=='AbortError')status(error?.message||'操作未完成，请重试','error');else status(previous);}}
+    finally{if(token===epoch){busy=false;renderBooks();}}
   }
-  async function selectBook(id,save=true){
-    const record=records.find(item=>item.id===id);if(!record)throw new Error('请先生成或导入密码本');
-    if(cached?.id!==id){const next=await API.Book.restore(record.raw);dropCache();cached=next;}
-    activeId=id;$('rename-row').classList.add('hidden');if(save)persist();return cached;
-  }
-  function download(text,name,type='text/plain;charset=utf-8'){
-    const url=URL.createObjectURL(new Blob([text],{type})),a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);
-  }
-  function readBookFile(file){
+  async function readText(file){
     if(typeof file.text==='function')return file.text();
-    return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result));reader.onerror=()=>reject(new Error('无法读取密码本文件，请重新选择'));reader.onabort=()=>reject(new Error('读取已取消'));reader.readAsText(file,'utf-8');});
+    return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result));reader.onerror=()=>reject(new Error('无法读取密码本文件'));reader.onabort=()=>reject(new Error('读取已取消'));reader.readAsText(file,'utf-8');});
   }
-  $('new-book').onclick=()=>task('正在生成新的密码本……',async()=>{
-    if(records.length>=200)throw new Error('当前浏览器已保存较多密码本，请换一个浏览器保存新的密码本');
-    const book=await API.Book.create();let number=1;while(records.some(record=>record.name==='密码本 '+number))number++;
-    const name='密码本 '+number,raw=await book.export(name),file=await API.Book.readFile(raw);
-    records.push({id:file.id,name:file.name,seed:file.seed,raw});dropCache();cached=book;activeId=file.id;
-    $('rename-row').classList.add('hidden');clearResult();persist();
-    status('已生成「'+name+'」，可以直接使用；请导出文件备份或交给对方','success');
-  });
+  async function readHandle(handle){const file=await handle.getFile();if(file.size>8192)throw new Error('密码本文件过大或格式不正确');return readText(file);}
+  async function writeBook(handle,raw,previous,token=epoch){
+    const before=await readHandle(handle);current(token);if(before!==previous)throw new Error('密码本文件已改变，请重新导入');
+    let stream;
+    try{stream=await handle.createWritable();current(token);await stream.write(new Blob([raw],{type:'application/json;charset=utf-8'}));current(token);await stream.close();stream=null;current(token);}
+    catch(error){if(stream){try{await stream.abort();}catch{}}throw error;}
+    const saved=await readHandle(handle),expected=await API.Book.readFile(raw),actual=await API.Book.readFile(saved);
+    current(token);
+    if(!sameBook(expected,actual)||expected.checksum!==actual.checksum)throw new Error('保存后的密码本校验未通过，请保留文件并重新导入');
+    return {raw:saved,file:actual};
+  }
+  async function selectBook(id,token=epoch){
+    current(token);
+    const record=records.find(item=>item.id===id);if(!record)throw new Error('请先导入或手动选择密码本');
+    if(record.handle){const raw=await readHandle(record.handle),file=await API.Book.readFile(raw);current(token);if(!sameBook(file,record.file))throw new Error('密码本文件已改变，请重新导入');record.raw=raw;record.file=file;record.name=file.name;}
+    if(cached?.id!==id){const next=await API.Book.restore(record.raw);if(token!==epoch){next.destroy();current(token);}dropCache();cached=next;}
+    activeId=id;$('rename-row').classList.add('hidden');return cached;
+  }
+  async function register(raw,handle=null,token=epoch){
+    const file=await API.Book.readFile(raw);current(token);const existing=records.find(item=>item.id===file.id);
+    if(existing&&!sameBook(existing.file,file))throw new Error('密码本编号冲突，请核对文件');
+    if(!existing&&records.length>=200)throw new Error('当前列表最多保留 200 本密码本，请先移除记录');
+    const engine=await API.Book.restore(raw);if(token!==epoch){engine.destroy();current(token);}
+    const record={id:file.id,name:file.name,file,raw,handle};
+    if(existing)records[records.indexOf(existing)]=record;else records.push(record);
+    dropCache();cached=engine;activeId=file.id;$('rename-row').classList.add('hidden');clearResult();
+  }
+  function pickerOptions(name,kind='book'){
+    return {id:kind==='book'?'midianji-selected-book':'midianji-text',suggestedName:name,types:[{description:kind==='book'?'密码本文件':'文本文件',accept:{[kind==='book'?'application/json':'text/plain']:[kind==='book'?'.itbook':'.txt']}}]};
+  }
+  const strictSaveMessage='此浏览器无法直接选择密码本保存位置，请使用电脑上的 Edge 或 Chrome 生成、重命名密码本；此处仍可导入和加解密';
+  $('new-book').onclick=()=>{
+    if(busy)return;if(!canChooseSave()){status(strictSaveMessage,'error');return;}
+    if(records.length>=200){status('当前列表最多保留 200 本密码本，请先移除记录','error');return;}
+    const stamp=new Date().toISOString().replace(/[:T]/g,'-').slice(0,19),generationEpoch=epoch;
+    let choice;try{choice=window.showSaveFilePicker(pickerOptions('密码本 '+stamp+'.itbook'));}catch(error){status(error.message,'error');return;}
+    return task('请选择密码本保存位置',async()=>{
+      const handle=await choice;if(generationEpoch!==epoch)return;
+      const previous=await readHandle(handle);current(generationEpoch);if(previous.length)throw new Error('生成新密码本不会覆盖已有文件，请选择新文件名');
+      const name=handle.name.replace(/\.itbook$/i,'').trim();if(!name||[...name].length>40)throw new Error('请使用 1–40 个字符的密码本文件名');
+      let book;
+      try{book=await API.Book.create();current(generationEpoch);const raw=await book.export(name);current(generationEpoch);const saved=await writeBook(handle,raw,previous,generationEpoch);await register(saved.raw,handle,generationEpoch);status('密码本已保存并导入','success');}
+      finally{book?.destroy();}
+    });
+  };
+  $('import-book').onclick=()=>{
+    if(busy)return;
+    if(typeof window.showOpenFilePicker!=='function'){$('book-file').click();return;}
+    let choice;try{choice=window.showOpenFilePicker({multiple:false,types:pickerOptions('').types});}catch(error){status(error.message,'error');return;}
+    return task('请选择密码本文件',async token=>{const [handle]=await choice;current(token);if(!handle)return;await register(await readHandle(handle),handle,token);status('密码本已导入','success');});
+  };
+  $('book-file').onchange=()=>{
+    const file=$('book-file').files?.[0];$('book-file').value='';if(!file)return;
+    return task('正在导入密码本',async token=>{if(file.size>8192)throw new Error('所选文件不是有效的密码本');await register(await readText(file),null,token);status('密码本已导入','success');});
+  };
+  $('rename-book').onclick=()=>{
+    if(!active()||busy)return;
+    if(!canChooseSave()||!active().handle){status('此浏览器不能写回原密码本，请在电脑上的 Edge 或 Chrome 重新导入后重命名','error');return;}
+    $('book-name').value=active().name;$('rename-row').classList.remove('hidden');$('book-name').focus();$('book-name').select();
+  };
+  $('cancel-name').onclick=()=>$('rename-row').classList.add('hidden');
+  $('book-name').onkeydown=event=>{if(event.key==='Enter'){event.preventDefault();$('rename-confirm').click();}if(event.key==='Escape')$('rename-row').classList.add('hidden');};
+  $('rename-confirm').onclick=()=>{
+    const record=active();if(!record?.handle||busy)return;
+    const name=$('book-name').value;let permission;try{permission=typeof record.handle.requestPermission==='function'?record.handle.requestPermission({mode:'readwrite'}):Promise.resolve('granted');}catch(error){status(error.message,'error');return;}
+    return task('正在重命名',async token=>{
+      if(await permission!=='granted')throw new Error('没有写入原文件的权限');
+      const previous=await readHandle(record.handle),file=await API.Book.readFile(previous);
+      current(token);
+      if(!sameBook(file,record.file)||file.checksum!==record.file.checksum)throw new Error('密码本文件已改变，请重新导入');
+      const raw=await API.Book.renameFile(previous,name),saved=await writeBook(record.handle,raw,previous,token);
+      record.name=saved.file.name;record.file=saved.file;record.raw=saved.raw;$('rename-row').classList.add('hidden');status('密码本已重命名','success');
+    });
+  };
+  function openBookMenu(last=false){
+    if(busy||!records.length)return;$('book-list').classList.remove('hidden');$('book-select').setAttribute('aria-expanded','true');
+    const choices=Array.from($('book-list').querySelectorAll('.book-choice'));(last?choices[choices.length-1]:choices.find(item=>item.dataset.bookId===activeId)||choices[0])?.focus();
+  }
   $('book-select').onclick=()=>{$('book-list').classList.contains('hidden')?openBookMenu():closeBookMenu();};
-  $('book-select').onkeydown=event=>{if(event.key==='ArrowDown'||event.key==='ArrowUp'){event.preventDefault();openBookMenu(true,event.key==='ArrowUp');}else if(event.key==='Escape'){event.preventDefault();closeBookMenu(true);}};
+  $('book-select').onkeydown=event=>{if(['ArrowDown','ArrowUp'].includes(event.key)){event.preventDefault();openBookMenu(event.key==='ArrowUp');}else if(event.key==='Escape')closeBookMenu(true);};
   $('book-list').onkeydown=event=>{
     if(event.key==='Escape'){event.preventDefault();closeBookMenu(true);return;}
     if(!['ArrowDown','ArrowUp','Home','End'].includes(event.key))return;
-    const choices=Array.from($('book-list').querySelectorAll('.book-choice'));if(!choices.length)return;event.preventDefault();
-    const index=choices.findIndex(button=>button.dataset.bookId===event.target.dataset.bookId);
-    const next=event.key==='Home'?0:event.key==='End'?choices.length-1:(index+(event.key==='ArrowDown'?1:-1)+choices.length)%choices.length;choices[next].focus();
+    const list=Array.from($('book-list').querySelectorAll('.book-choice'));if(!list.length)return;event.preventDefault();
+    const index=list.indexOf(event.target),next=event.key==='Home'?0:event.key==='End'?list.length-1:(index+(event.key==='ArrowDown'?1:-1)+list.length)%list.length;list[next].focus();
   };
   document.addEventListener('click',event=>{if(!$('book-picker').contains(event.target))closeBookMenu();});
   $('book-picker').addEventListener('focusout',event=>{if(event.relatedTarget&&!$('book-picker').contains(event.relatedTarget))closeBookMenu();});
-  $('import-book').onclick=()=>$('book-file').click();
-  $('book-file').onchange=()=>{
-    const file=$('book-file').files?.[0];$('book-file').value='';if(!file)return;
-    task('正在导入密码本……',async()=>{
-      if(file.size>8192)throw new Error('所选文件不是有效的密码本，请选择导出的 .itbook 文件');
-      const parsed=await API.Book.readFile(await readBookFile(file)),existing=records.find(item=>item.id===parsed.id);
-      if(existing&&existing.seed!==parsed.seed)throw new Error('密码本编号发生冲突，请核对文件');
-      if(!existing){if(records.length>=200)throw new Error('当前浏览器已保存较多密码本，请换一个浏览器导入');records.push({id:parsed.id,name:parsed.name,seed:parsed.seed,raw:JSON.stringify(parsed,null,2)});}
-      await selectBook(parsed.id);clearResult();status('已载入「'+active().name+'」，可以直接加密和解密','success');
-    });
-  };
-  $('export-book').onclick=()=>{
-    const record=active();if(!record||busy||savingFile)return;
-    const filename=record.name.replace(/[<>:"/\\|?*\u0000-\u001F]/g,'_')+'.itbook';
-    return saveFile({text:record.raw,name:filename,type:'application/json',extension:'.itbook',description:'密码本文件',title:'导出密码本',saved:'密码本已保存',origin:'export-book',pickerId:'midianji-codebook'});
-  };
-  $('rename-book').onclick=()=>{if(!active())return;$('book-name').value=active().name;$('rename-row').classList.remove('hidden');$('book-name').focus();$('book-name').select();};
-  $('cancel-name').onclick=()=>$('rename-row').classList.add('hidden');
-  $('book-name').onkeydown=event=>{if(event.key==='Enter'){event.preventDefault();$('save-name').click();}if(event.key==='Escape')$('rename-row').classList.add('hidden');};
-  $('save-name').onclick=()=>task('正在保存名称……',async()=>{
-    const record=active();if(!record)throw new Error('请先选择密码本');
-    const raw=await API.Book.renameFile(record.raw,$('book-name').value),file=await API.Book.readFile(raw);record.name=file.name;record.raw=raw;
-    $('rename-row').classList.add('hidden');persist();status('已重命名为「'+file.name+'」','success');
-  });
-  function requestDelete(id){
-    const record=records.find(item=>item.id===id);if(busy||!record)return;closeBookMenu();
-    pendingDeleteId=record.id;
-    $('delete-description').textContent='删除「'+record.name+'」的本机记录？已导出的文件不会删除，如果没有文件备份，删除后将无法恢复这本密码本';
-    $('delete-dialog').showModal();$('cancel-delete').focus();
-  }
+  function requestDelete(id){const record=records.find(item=>item.id===id);if(!record||busy)return;closeBookMenu();pendingDelete=id;$('delete-description').textContent='从当前列表移除「'+record.name+'」？密码本文件仍保存在原位置';$('delete-dialog').showModal();$('cancel-delete').focus();}
   $('cancel-delete').onclick=()=>$('delete-dialog').close();
-  $('delete-dialog').onclose=()=>{pendingDeleteId='';$('book-select').focus();};
+  $('delete-dialog').onclose=()=>{pendingDelete='';$('book-select').focus();};
   $('confirm-delete').onclick=()=>{
-    const record=records.find(item=>item.id===pendingDeleteId);if(!record){$('delete-dialog').close();return;}
-    const nextRecords=records.filter(item=>item.id!==record.id);
-    if(!persist(nextRecords)){$('delete-dialog').close();status('无法删除本机记录：浏览器不允许保存更改，请稍后再试','error');return;}
-    records=nextRecords;
-    if(activeId===record.id){dropCache();activeId='';$('rename-row').classList.add('hidden');clearResult();}
-    $('delete-dialog').close();renderBooks();status('已删除「'+record.name+'」的本机记录，需要时可重新导入已导出的文件','success');
+    const record=records.find(item=>item.id===pendingDelete);if(!record){$('delete-dialog').close();return;}
+    if(activeId===record.id){dropCache();activeId='';clearResult();$('rename-row').classList.add('hidden');}
+    records=records.filter(item=>item!==record);record.raw='';record.handle=null;record.file=null;
+    $('delete-dialog').close();renderBooks();status('密码本记录已移除','success');
   };
   function run(action){
-    if(busy)return;clearResult();
-    return task(action==='encode'?'正在加密……':'正在解密……',async()=>{
-      const input=$('input').value;if(!input)throw new Error('请先输入要处理的内容');
-      if(!active())throw new Error('请先导入或手动选择密码本');
-      if(action==='encode'&&await API.isMessage(input))throw new Error('这段内容已经加密过了，要查看原文，请点击“密文翻译”');
-      const engine=await selectBook(activeId);
-      $('output').value=action==='encode'?await engine.encode(input):await engine.decode(input);lastAction=action;
-      $('result-type').textContent=action==='encode'?'密文':'原文';
-      status(action==='encode'?'加密完成':'解密完成','success');
+    if(busy)return;const text=$('input').value;clearResult();
+    return task(action==='encode'?'正在加密':'正在解密',async token=>{
+      if(!text)throw new Error(action==='encode'?'请先输入要加密的内容':'请先粘贴要解密的密文');
+      if(!active())throw new Error('请先生成、导入或手动选择密码本');
+      const engine=await selectBook(activeId,token),result=action==='encode'?await engine.encode(text):await engine.decode(text);current(token);$('output').value=result;
+      lastAction=action;$('result-type').textContent=action==='encode'?'密文':'原文';status(action==='encode'?'加密完成':'解密完成','success');
     });
   }
   $('encode').onclick=()=>run('encode');$('decode').onclick=()=>run('decode');
-  $('input').oninput=()=>{count();clearResult();status('输入完成后，点击“信息加密”或“密文翻译”');};
-  $('input').onkeydown=async event=>{if((event.ctrlKey||event.metaKey)&&event.key==='Enter'){event.preventDefault();run(await API.isMessage($('input').value)?'decode':'encode');}};
-  $('clear-text').onclick=()=>{$('input').value='';clearResult();count();status('内容已清空，密码本保持不变');};
-  $('reverse').onclick=()=>{if(!$('output').value||busy)return;$('input').value=$('output').value;count();run(lastAction==='encode'?'decode':'encode');};
+  $('input').oninput=()=>{count();clearResult();status('');};
+  $('input').onkeydown=async event=>{if((event.ctrlKey||event.metaKey)&&event.key==='Enter'){event.preventDefault();const token=epoch,text=$('input').value,decoded=await API.isMessage(text);if(token===epoch&&!busy&&text===$('input').value)run(decoded?'decode':'encode');}};
+  $('clear-text').onclick=()=>{if(busy)return;$('input').value='';clearResult();count();status('内容已清空');$('input').focus();};
+  $('reverse').onclick=()=>{if(busy||!$('output').value)return;$('input').value=$('output').value;count();run(lastAction==='encode'?'decode':'encode');};
   $('copy').onclick=async()=>{
-    if(!$('output').value)return;
-    try{if(!navigator.clipboard?.writeText)throw new Error();await navigator.clipboard.writeText($('output').value);copied();}
-    catch{
-      $('output').focus();$('output').select();
-      if(typeof $('output').setSelectionRange==='function')$('output').setSelectionRange(0,$('output').value.length);
-      let success=false;
-      try{success=document.execCommand('copy');}catch{}
-      if(success)copied();else status('结果已选中，请使用系统复制');
-    }
+    if(!$('output').value)return;let success=false;
+    try{if(navigator.clipboard?.writeText){await navigator.clipboard.writeText($('output').value);success=true;}}catch{}
+    if(!success){$('output').focus();$('output').select();try{success=document.execCommand('copy');}catch{}}
+    if(success){clearTimeout(copyTimer);$('copy-toast').classList.remove('hidden');copyTimer=setTimeout(()=>$('copy-toast').classList.add('hidden'),1000);}else status('结果已选中，请使用系统复制');
   };
-  function saveFilename(){
-    const value=$('save-name').value.trim();
-    if(!value||/[<>:"/\\|?*\u0000-\u001F]/.test(value))throw new Error('请填写有效的文件名');
-    return value.toLowerCase().endsWith(pendingFile.extension)?value:value+pendingFile.extension;
-  }
-  function shareableFile(data,name){
-    try{if(typeof File!=='function'||typeof navigator.share!=='function'||typeof navigator.canShare!=='function')return null;const file=new File([data.text],name,{type:data.type});return navigator.canShare({files:[file]})?file:null;}catch{return null;}
-  }
-  function openFileSave(data){
-    pendingFile=data;$('save-title').textContent=data.title;$('save-name').value=data.name;
-    const canShare=!!shareableFile(data,data.name);
-    $('share-file').classList.toggle('hidden',!canShare);
-    $('save-description').textContent=canShare?'可选择系统保存方式，或下载到浏览器指定的位置':'保存位置由浏览器的下载设置决定';
-    $('save-dialog').showModal();$('save-name').focus();$('save-name').select();
-  }
+  function download(text,name,type){const url=URL.createObjectURL(new Blob([text],{type})),link=document.createElement('a');link.href=url;link.download=name;document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);}
+  function shareable(data,name){try{if(typeof navigator.share!=='function'||typeof navigator.canShare!=='function')return null;const file=new File([data.text],name,{type:data.type});return navigator.canShare({files:[file]})?file:null;}catch{return null;}}
+  function saveName(){const value=$('save-name').value.trim();if(!value||/[<>:"/\\|?*\u0000-\u001F]/.test(value))throw new Error('请填写有效的文件名');return value.toLowerCase().endsWith(pendingFile.extension)?value:value+pendingFile.extension;}
+  function openFileSave(data){pendingFile=data;$('save-title').textContent=data.title;$('save-name').value=data.name;const sharing=!!shareable(data,data.name);$('share-file').classList.toggle('hidden',!sharing);$('save-description').textContent=sharing?'请选择系统保存方式，保存后核对文件是否存在':'此浏览器的保存位置由下载设置决定，确认后才会下载';$('save-dialog').showModal();$('save-name').focus();$('save-name').select();}
   $('cancel-save').onclick=()=>$('save-dialog').close();
   $('save-dialog').onclose=()=>{const origin=pendingFile?.origin;pendingFile=null;if(origin)$(origin).focus();};
-  $('save-download').onclick=()=>{
-    if(!pendingFile||savingFile)return;
-    try{download(pendingFile.text,saveFilename(),pendingFile.type);$('save-dialog').close();status('已请求下载，请在浏览器的下载列表中查看');}
-    catch(error){$('save-description').textContent=error?.message||'无法下载文件，请重试';}
-  };
+  $('save-download').onclick=()=>{if(!pendingFile||savingFile)return;try{const data=pendingFile;download(data.text,saveName(),data.type);$('save-dialog').close();status(data.extension==='.itbook'?'请重新选择保存的旧密码本文件进行核对':'已请求下载，请在浏览器下载列表中查看');}catch(error){$('save-description').textContent=error.message;}};
   $('share-file').onclick=async()=>{
-    if(!pendingFile||savingFile)return;
-    let file;try{file=shareableFile(pendingFile,saveFilename());}catch(error){$('save-description').textContent=error.message;return;}
-    if(!file){$('save-description').textContent='当前浏览器无法打开系统保存菜单，请选择下载文件';return;}
+    if(!pendingFile||savingFile)return;let file;try{file=shareable(pendingFile,saveName());}catch(error){$('save-description').textContent=error.message;return;}
+    if(!file){$('save-description').textContent='当前浏览器无法打开系统保存菜单';return;}
     savingFile=true;$('share-file').disabled=true;$('save-download').disabled=true;buttons();
-    try{await navigator.share({files:[file]});$('save-dialog').close();status('已交给系统处理，请确认文件已保存');}
-    catch(error){if(error?.name!=='AbortError')$('save-description').textContent='无法打开系统保存菜单，请选择下载文件';}
+    try{const book=pendingFile.extension==='.itbook';await navigator.share({files:[file]});$('save-dialog').close();status(book?'请重新选择保存的旧密码本文件进行核对':'已交给系统处理，请确认文件已保存');}
+    catch(error){if(error?.name!=='AbortError')$('save-description').textContent='无法打开系统保存菜单';}
     finally{savingFile=false;$('share-file').disabled=false;$('save-download').disabled=false;buttons();}
   };
-  async function saveFile(data){
-    if(typeof window.showSaveFilePicker!=='function'){openFileSave(data);return;}
-    savingFile=true;buttons();let stream,selected=false;
-    try{
-      // Open directly from the click so the browser retains user activation.
-      const handle=await window.showSaveFilePicker({id:data.pickerId,suggestedName:data.name,types:[{description:data.description,accept:{[data.type]:[data.extension]}}]});
-      selected=true;stream=await handle.createWritable();
-      await stream.write(new Blob([data.text],{type:data.type+';charset=utf-8'}));await stream.close();stream=null;
-      status(data.saved,'success');
-    }catch(error){
-      if(stream){try{await stream.abort();}catch{}}
-      if(error?.name==='AbortError'&&!selected)return;
-      if(!selected&&['SecurityError','NotSupportedError'].includes(error?.name)){openFileSave(data);return;}
-      status('无法保存'+(data.extension==='.itbook'?'密码本':'文本')+'，请重新选择位置或检查写入权限','error');
-    }finally{savingFile=false;buttons();}
-  }
   $('download-text').onclick=()=>{
-    const text=$('output').value;if(!text||busy||savingFile)return;
-    const name=lastAction==='encode'?'加密内容.txt':'解密文字.txt';
-    return saveFile({text,name,type:'text/plain',extension:'.txt',description:'文本文件',title:'保存文本',saved:'文本已保存',origin:'download-text',pickerId:'information-translator-text'});
+    if(busy||savingFile||!$('output').value)return;
+    const data={text:$('output').value,name:lastAction==='encode'?'密文.txt':'原文.txt',type:'text/plain',extension:'.txt',title:'保存文本',origin:'download-text'};
+    if(!canChooseSave()){openFileSave(data);return;}
+    let choice;try{choice=window.showSaveFilePicker(pickerOptions(data.name,'text'));}catch(error){status(error.message,'error');return;}
+    return task('请选择文本保存位置',async()=>{let stream;try{const handle=await choice;stream=await handle.createWritable();await stream.write(new Blob([data.text],{type:'text/plain;charset=utf-8'}));await stream.close();stream=null;status('文本已保存','success');}catch(error){if(stream){try{await stream.abort();}catch{}}throw error;}});
   };
-  async function load(){
-    let raw;
-    try{localStorage.removeItem('information-translator.v2.passphrase');raw=localStorage.getItem(STORAGE_KEY);}
-    catch{$('book-storage').textContent='此环境无法自动保存密码本，请导出文件备份，下次再导入';$('book-storage').classList.add('warning');return;}
-    if(!raw)return;
-    await task('正在载入本机保存的密码本……',async()=>{
-      let saved;try{if(raw.length>2*1024*1024)throw new Error();saved=JSON.parse(raw);if(saved?.v!==1||!Array.isArray(saved.files)||saved.files.length>200)throw new Error();}
-      catch{throw new Error('本机密码本记录无法读取，请导入之前导出的 .itbook 文件');}
-      let skipped=0;
-      for(const fileText of saved.files){try{const file=await API.Book.readFile(fileText);if(!records.some(item=>item.id===file.id))records.push({id:file.id,name:file.name,seed:file.seed,raw:JSON.stringify(file,null,2)});}catch{skipped++;}}
-      if(!records.length)throw new Error('本机没有可用的密码本，请重新导入文件');
-      activeId='';dropCache();$('book-storage').textContent='已读取当前浏览器保存的记录，请手动选择或导入密码本';
-      status(skipped?'部分本机记录无法读取，请手动导入所需的密码本':'请先手动导入或选择密码本，再处理内容');
+  // Existing records are read solely for user-directed migration. No new keys are persisted.
+  function renderLegacy(){
+    $('legacy-list').replaceChildren();if(!legacy)return;
+    $('legacy-description').textContent='旧版曾把密码本保存在此浏览器，请逐本另存并核对，再清除旧记录';
+    for(const item of legacy.entries){
+      const row=document.createElement('div'),name=document.createElement('span'),state=document.createElement('span'),save=document.createElement('button'),verify=document.createElement('button');
+      row.className='legacy-item';name.className='legacy-name';name.textContent=item.file.name;state.className='legacy-state'+(item.verified?' done':'');state.textContent=item.verified?'已核对':'待保存、核对';
+      save.className=verify.className='button';save.type=verify.type='button';save.textContent='保存旧密码本';verify.textContent='选择文件核对';save.onclick=()=>saveLegacy(item);verify.onclick=()=>{legacyVerifyId=item.file.id;$('legacy-file').click();};
+      row.append(name,state,save,verify);$('legacy-list').append(row);
+    }
+    $('legacy-clear').disabled=!legacy.entries.length||legacy.entries.some(item=>!item.verified);buttons();
+  }
+  function saveLegacy(item){
+    if(busy)return;
+    if(!canChooseSave()){openFileSave({text:item.raw,name:item.file.name+'.itbook',type:'application/json',extension:'.itbook',title:'保存旧密码本',origin:'legacy-open'});return;}
+    let choice;try{choice=window.showSaveFilePicker(pickerOptions(item.file.name+'.itbook'));}catch(error){status(error.message,'error');return;}
+    return task('请选择旧密码本保存位置',async token=>{
+      const handle=await choice,previous=await readHandle(handle);
+      current(token);
+      if(previous){let file;try{file=await API.Book.readFile(previous);}catch{throw new Error('请选择新文件，避免覆盖其他内容');}if(!sameBook(file,item.file))throw new Error('所选位置已存有其他密码本，请更换文件名');}
+      await writeBook(handle,item.raw,previous,token);item.verified=true;renderLegacy();status('旧密码本已保存并核对','success');
     });
   }
-  window.addEventListener('pagehide',dropCache);
-  renderBooks();
+  $('legacy-file').onchange=()=>{
+    const file=$('legacy-file').files?.[0],item=legacy?.entries.find(entry=>entry.file.id===legacyVerifyId);$('legacy-file').value='';legacyVerifyId='';if(!file||!item)return;
+    return task('正在核对密码本文件',async token=>{if(file.size>8192)throw new Error('所选文件不是正确的密码本');const parsed=await API.Book.readFile(await readText(file));current(token);if(!sameBook(parsed,item.file)||parsed.checksum!==item.file.checksum)throw new Error('所选文件与旧密码本不一致');item.verified=true;renderLegacy();status('旧密码本文件已核对','success');});
+  };
+  $('legacy-open').onclick=()=>{if(legacy){renderLegacy();$('legacy-dialog').showModal();}};
+  $('legacy-later').onclick=()=>$('legacy-dialog').close();
+  $('legacy-clear').onclick=()=>{
+    if(busy||!legacy||legacy.entries.some(item=>!item.verified))return;
+    try{if(localStorage.getItem(LEGACY_KEY)!==legacy.snapshot)throw new Error('旧记录已被其他页面修改，请刷新后重新核对');localStorage.removeItem(LEGACY_KEY);if(localStorage.getItem(LEGACY_KEY)!==null)throw new Error('旧记录未能清除，请保留密码本文件并重试');legacy=null;$('legacy-list').replaceChildren();$('legacy-dialog').close();buttons();status('旧记录已清除，新版不再自动保存密码本','success');}
+    catch(error){$('legacy-description').textContent=error.message;status(error.message,'error');}
+  };
+  async function loadLegacy(){
+    const token=epoch;
+    let snapshot;try{snapshot=localStorage.getItem(LEGACY_KEY);}catch{return;}if(!snapshot)return;
+    try{
+      if(snapshot.length>2*1024*1024)throw new Error();const data=JSON.parse(snapshot);if(data?.v!==1||!Array.isArray(data.files)||data.files.length>200)throw new Error();
+      const entries=[];for(const raw of data.files){const file=await API.Book.readFile(raw);current(token);if(entries.some(item=>item.file.id===file.id&&!sameBook(item.file,file)))throw new Error();if(!entries.some(item=>sameBook(item.file,file)))entries.push({raw,file,verified:false});}
+      if(!entries.length)return;legacy={snapshot,entries};renderLegacy();$('legacy-dialog').showModal();
+    }catch{if(token===epoch)status('旧浏览器记录无法读取，请先保留原数据并确认密码本文件备份','error');}
+  }
+  function resetRuntime(){
+    epoch++;dropCache();for(const record of records){record.raw='';record.handle=null;record.file=null;}records=[];activeId='';legacy=null;pendingFile=null;busy=false;savingFile=false;pendingDelete='';legacyVerifyId='';
+    clearTimeout(copyTimer);$('copy-toast').classList.add('hidden');$('input').value='';$('output').value='';$('result-type').textContent='';$('rename-row').classList.add('hidden');$('book-name').value='';$('legacy-list').replaceChildren();
+    for(const id of ['save-dialog','delete-dialog','legacy-dialog'])if($(id).open)$(id).close();count();status('');renderBooks();
+  }
+  window.addEventListener('pagehide',resetRuntime);
+  window.addEventListener('pageshow',event=>{if(event.persisted)loadLegacy();});
+  renderBooks();count();
   if(!API.supported()){$('compat').classList.remove('hidden');for(const id of ['new-book','import-book','encode','decode'])$(id).disabled=true;}
-  else load();
+  else loadLegacy();
 })();
 </script>
-</body>
-</html>
+</body></html>

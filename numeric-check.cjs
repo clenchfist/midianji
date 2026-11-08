@@ -8,9 +8,9 @@ for(const file of ['source2.html','dist/2/index.html']){
   for(const tag of ['script','style'])for(const m of html.matchAll(new RegExp('<'+tag+'[^>]*>([\\s\\S]*?)</'+tag+'>','g'))){assert(html.includes("'sha256-"+createHash('sha256').update(m[1]).digest('base64')+"'"));if(tag==='script')new vm.Script(m[1]);}
 }
 assert(two.includes('<h1>密电机2号</h1>'));assert(one.includes('<h1>密电机</h1>'));assert(!one.includes('function decimal('));
-assert.equal(two.match(/<style>([\s\S]*?)<\/style>/)[1],one.match(/<style>([\s\S]*?)<\/style>/)[1]);
-assert.equal(two.match(/<details[\s\S]*?<\/details>/)[0],one.match(/<details[\s\S]*?<\/details>/)[0]);
-assert(two.includes("STORAGE_KEY='information-translator.books2'"));assert(one.includes("STORAGE_KEY='information-translator.books'"));
+// The original app now has its own session-only UI; No. 2 keeps its existing UI.
+assert.equal(two.match(/<div class="help-body">([\s\S]*?)<\/div><\/details>/)[1],one.match(/<div class="help-body">([\s\S]*?)<\/div><\/details>/)[1]);
+assert(two.includes("STORAGE_KEY='information-translator.books2'"));assert(one.includes("LEGACY_KEY='information-translator.books'"));assert(!one.includes('localStorage.setItem'));
 assert.equal(JSON.parse(fs.readFileSync(path.join(dir,'manifest.webmanifest'))).name,'密电机2号');
 function api(html,codec=false){
   let core=html.match(/<script id="translator-core">([\s\S]*?)<\/script>/)[1];
