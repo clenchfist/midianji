@@ -43,8 +43,9 @@ async function cacheChecks(){
   const restored=await b.api.Book.restore(await book.export('再次导入'));
   for(const text of ['中文简体與繁體','English words 0123456789','𠮷𠀀👨‍👩‍👧‍👦 e\u0301\n换行\t空格','000001234567890','a']){
     const cipher=await book.encode(text);assert(/^[0-9]+$/.test(cipher));assert.equal(await restored.decode(cipher),text);
-    assert.equal(await original.decode(packet64(b.codec.undecimal(cipher))),text,'Only the external representation may change');
-    assert.equal(await book.decode(await original.encode(text)),text,'Existing ciphertext remains readable');
+    assert.equal(b.api.inspect(cipher).version,3);
+    const legacy=await original.encode(text);assert.equal(await book.decode(legacy),text,'Existing alphabetic ciphertext remains readable');
+    assert.equal(await book.decode(b.codec.decimal(Uint8Array.from(Buffer.from(legacy,'base64url')))),text,'Existing numeric ciphertext remains readable');
     assert.equal(await book.decode(cipher.match(/.{1,19}/g).join(' \n')),text);
     assert(await b.api.isMessage(cipher));assert.notEqual(await book.encode(text),cipher);
     await assert.rejects(()=>other.decode(cipher),{message:'密码本错误'});
@@ -52,11 +53,30 @@ async function cacheChecks(){
     const changed=cipher.slice(0,-1)+(cipher.at(-1)==='0'?'1':'0');await assert.rejects(()=>book.decode(changed));
   }
   assert(!await b.api.isMessage('12345678901234567890'));
-  const cipher=await book.encode('认证检查'),packet=b.codec.undecimal(cipher);packet[45]^=1;
-  const checksum=new Uint8Array(await webcrypto.subtle.digest('SHA-256',Buffer.concat([Buffer.from('INFO-TRANSLATOR/BOOK/2/PACKET/'),Buffer.from(packet.subarray(0,-16))]))).subarray(0,16);
-  packet.set(checksum,packet.length-16);
+  const cipher=await book.encode('认证检查'),packet=b.codec.undecimal(cipher);packet[37]^=1;
+  const checksum=new Uint8Array(await webcrypto.subtle.digest('SHA-256',Buffer.concat([Buffer.from('INFO-TRANSLATOR/BOOK/3/PACKET/'),Buffer.from(packet.subarray(0,-4))]))).subarray(0,4);
+  packet.set(checksum,packet.length-4);
   await assert.rejects(()=>book.decode(b.codec.decimal(packet)),{message:'内容不完整或已被改动，请重新复制完整内容'});
-  const max='𠮷'.repeat(20000),maxCipher=await book.encode(max);assert.equal(maxCipher.length,150273);assert.equal(await book.decode(maxCipher),max);await assert.rejects(()=>book.encode(max+'字'));
+  const max='𠮷'.repeat(20000),maxCipher=await book.encode(max);assert.equal(maxCipher.length,131403);assert.equal(await book.decode(maxCipher),max);await assert.rejects(()=>book.encode(max+'字'));
+  for(let n=1;n<=40;n++){
+    const text=Array.from({length:n},(_,i)=>String.fromCodePoint([0,1,0x20,0x7f,0x4e00,0x20bb7,0x10ffff][i%7])).join('');
+    assert.equal(await restored.decode(await book.encode(text)),text,'Every 21-bit alignment and Unicode range must round-trip');
+  }
+  const mixed=Array.from({length:10000},(_,i)=>{const cp=(i*7919)%0x110000;return String.fromCodePoint(cp>=0xd800&&cp<=0xdfff?0x4e00:cp);}).join('');assert.equal(await restored.decode(await book.encode(mixed)),mixed);
+  const nativePacket=b.codec.undecimal(await book.encode('AES参数检查'));
+  const rootKey=await webcrypto.subtle.importKey('raw',Buffer.from(JSON.parse(raw).seed,'base64url'),'HKDF',false,['deriveKey']);
+  const nativeKey=await webcrypto.subtle.deriveKey({name:'HKDF',hash:'SHA-256',salt:nativePacket.subarray(0,16),info:Buffer.from('INFO-TRANSLATOR/BOOK/3/MESSAGE')},rootKey,{name:'AES-GCM',length:256},false,['decrypt']);
+  assert.equal(nativeKey.algorithm.length,256);
+  const nativeAad=Buffer.concat([Buffer.from('INFO-TRANSLATOR/BOOK/3/CONTENT/'),Buffer.from(nativePacket.subarray(0,37))]);
+  const plain=await webcrypto.subtle.decrypt({name:'AES-GCM',iv:nativePacket.subarray(16,28),additionalData:nativeAad,tagLength:128},nativeKey,nativePacket.subarray(37,-4));assert.equal(new DataView(plain).getUint32(0,false),7);
+  for(let tagByte=0;tagByte<16;tagByte++){
+    const damaged=nativePacket.slice();damaged[damaged.length-4-16+tagByte]^=1;
+    damaged.set(new Uint8Array(await webcrypto.subtle.digest('SHA-256',Buffer.concat([Buffer.from('INFO-TRANSLATOR/BOOK/3/PACKET/'),Buffer.from(damaged.subarray(0,-4))]))).subarray(0,4),damaged.length-4);
+    await assert.rejects(()=>book.decode(b.codec.decimal(damaged)),{message:'内容不完整或已被改动，请重新复制完整内容'});
+  }
+  const lengthExamples=[];
+  for(const n of [1,10,100,1000,20000]){const message=await book.encode('文'.repeat(n)),oldBytes=77+Math.ceil((4+3*n)/64)*64;lengthExamples.push({characters:n,previousDigits:Math.floor(oldBytes/2)*5+3,newDigits:message.length});}
+  console.log(JSON.stringify({lengthExamples}));
   await assert.rejects(()=>book.encode('\uD800'));
   assert.notEqual((await book.encode('随机前缀')).slice(0,40),(await book.encode('随机前缀')).slice(0,40));
   await cacheChecks();

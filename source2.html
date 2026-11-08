@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="description" content="离线密电机2号，生成随机密码本，双方导入同一密码本即可加密和解密">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-7Zy6z5hRpi1I/UtWZQDAf5id0io37EGqVHXgFQ+bZ28=' 'sha256-1Rv3/svWdCRqLDgrE9Avros0BrzAYdx9A93Nq6pM/i0='; style-src 'sha256-5md/OTX4L5npoxeiWXJH4OTwZu2uU2KUc+r/JFrJK7I='; img-src data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'"><meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-M0lfMeyflDwMBoozd8uWiOqAm9YtYvAkxevYavdtuAs=' 'sha256-1Rv3/svWdCRqLDgrE9Avros0BrzAYdx9A93Nq6pM/i0='; style-src 'sha256-5md/OTX4L5npoxeiWXJH4OTwZu2uU2KUc+r/JFrJK7I='; img-src data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'"><meta name="referrer" content="no-referrer">
 <title>密电机2号</title><style>:root{color-scheme:light;--ink:#27303e;--muted:#7b8492;--line:#e4e7ec;--accent:#465f85;font-family:"SimSun","宋体","Songti SC",serif;font-synthesis:none}*{box-sizing:border-box}body{margin:0;background:#f5f6f8;color:var(--ink);font-size:15px;line-height:1.7}button,input,textarea,select{font:inherit}button{cursor:pointer}button:disabled{cursor:default;opacity:.4}button,input,textarea,select,summary{outline-offset:3px}button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,summary:focus-visible{outline:2px solid #718db2}button{transition:background .15s}.app{max-width:1000px;margin:36px auto;padding:0 28px}.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}.identity{display:flex;align-items:center;gap:11px}.app-icon{display:grid;place-items:center;width:32px;height:32px;border-radius:7px;color:#60738d;background:#e7ecf3;font-size:23px;line-height:1}h1{font-size:20px;font-weight:600;margin:0;letter-spacing:.3px}.text-button{background:transparent;border:0;color:var(--muted);font-size:14px;padding:5px;white-space:nowrap}.text-button:hover{color:var(--accent)}.credentials{background:white;border:1px solid var(--line);border-radius:10px;padding:18px 21px;margin-bottom:19px}.credential-heading{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:11px}.credential-heading label{font-size:15px;font-weight:600}.credential-heading span{font-size:14px;color:var(--muted)}.book-row{display:flex;gap:10px;align-items:center}.book-row select{flex:1;min-width:130px;width:100%;padding:9px 11px;border:1px solid #dce1e8;background:#fafbfc;border-radius:6px;color:var(--ink);font-size:14px;height:39px}.book-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}.book-note{font-size:13px;color:#718092;margin:11px 0 3px}.book-storage{font-size:13px;color:#939ba8;margin:0}.book-storage.warning{color:#9a6c32}.rename-row{display:flex;align-items:center;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid #edf0f3}.rename-row label{font-size:13px;white-space:nowrap;color:var(--muted)}.rename-row input{min-width:0;flex:1;padding:8px 10px;border:1px solid var(--line);border-radius:6px;color:var(--ink);font-size:14px}input::placeholder,textarea::placeholder{color:#a0a7b1}.editor-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.panel{background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden;min-width:0}.panel-heading{display:flex;align-items:center;justify-content:space-between;padding:15px 18px 12px;gap:10px}.panel-heading label{font-size:14px;font-weight:600}.count,.result-type{font-size:13px;color:#929baa}.panel textarea{display:block;width:100%;height:260px;min-height:160px;resize:vertical;border:0;border-top:1px solid #edf0f3;border-bottom:1px solid #edf0f3;background:#fff;padding:16px 18px;font-size:15px;line-height:1.9;color:#334054;overflow-wrap:anywhere}.panel textarea:focus-visible{outline-offset:-2px}.panel textarea[readonly]{background:#fbfcfd;font-family:Consolas,"SimSun","宋体","Songti SC",serif;font-size:14px}.panel-actions{display:flex;align-items:center;justify-content:space-between;padding:13px 15px;gap:8px;min-height:62px}.button-group{display:flex;gap:8px}.button{border:1px solid #dbe1e9;border-radius:6px;padding:8px 17px;background:#fff;color:#4b5a6e;font-size:14px;white-space:nowrap;line-height:1.6}.button:hover{background:#f2f5f9}.button.primary{background:var(--accent);border-color:var(--accent);color:white;min-width:82px}.button.primary:hover{background:#354f73}.button.subtle{background:#f9fafc;border-color:var(--line);color:#6c7889}.status{min-height:22px;margin:11px 2px 19px;color:#7b8492;font-size:13px}.status.error{color:#ad4d49}.status.success{color:#497557}.help{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:13px 2px}.help summary{list-style:none;display:flex;align-items:center;gap:10px;cursor:pointer;color:#677383;font-size:14px}.help summary:before{content:"›";display:inline-block;font-size:17px;line-height:1;transition:transform .15s}.help[open] summary:before{transform:rotate(90deg)}.help summary::-webkit-details-marker{display:none}.help-body{padding:9px 0 3px 19px;font-size:14px;line-height:1.9;color:#667181}.help-body ol{padding-left:18px;margin:3px 0 12px}.help-body p{margin:8px 0}.muted{font-size:13px;color:#939ba8}footer{display:flex;gap:12px;color:#a3abb6;font-size:13px;margin-top:20px;padding-bottom:10px}footer span:before{content:"·";margin-right:12px}.notice{font-size:14px;background:#fff;border:1px solid #e8dcda;border-radius:8px;padding:13px 16px}.hidden{display:none!important}@media(max-width:800px){.book-row{align-items:stretch;flex-direction:column}.book-actions{flex-wrap:wrap}.book-actions .button{padding:7px 14px}.credential-heading span{font-size:13px}}@media(max-width:700px){.app{padding:0 17px;margin:25px auto}.header{margin-bottom:19px}.credentials{padding:16px}.credential-heading{align-items:flex-start;flex-direction:column;gap:3px}.editor-grid{grid-template-columns:1fr;gap:15px}.panel textarea{height:210px}.button{padding:8px 14px}.status{margin-bottom:17px}.help-body{padding-left:14px}h1{font-size:19px}.rename-row{flex-wrap:wrap}.rename-row label{width:100%}.rename-row input{width:130px}}@media(prefers-reduced-motion:reduce){*{transition:none!important}}
 @media(max-width:420px){.book-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.book-actions .button{font-size:13px;padding:8px 6px}.book-actions .text-button{border:1px solid var(--line);border-radius:6px;background:#f9fafc}}
 .book-actions .book-action{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:40px;padding:7px 12px;border:1px solid var(--action-border);background:var(--action-bg);color:var(--action-ink);font-weight:500;box-shadow:0 1px 2px #27303e06;transition:background .15s,border-color .15s}
@@ -150,21 +150,22 @@ const InformationTranslator=(()=>{
     }
     const packet=/^[0-9]+$/.test(compact)?undecimal(compact):unbase64(compact);
     // Random salt and IV come first; the version lives inside the binary envelope.
-    if(packet.length<141||(packet.length-77)%64!==0)fail('密文不完整，请重新复制');
-    if(packet[28]!==2)fail('无法识别密文，请确认复制完整并使用相同的加密器');
-    return {version:2,packet};
+    const version=packet[28];
+    if(version!==2&&version!==3)fail('无法识别密文，请确认复制完整并使用相同的加密器');
+    if(version===2?(packet.length<141||(packet.length-77)%64!==0):(packet.length<65||(packet.length-57)%8!==0))fail('密文不完整，请重新复制');
+    return {version,packet};
   }
-  async function packetChecksum(packet){return (await hash(concat(enc.encode('INFO-TRANSLATOR/BOOK/2/PACKET/'),packet))).subarray(0,16);}
-  async function validPacket(packet){return equal(await packetChecksum(packet.subarray(0,-16)),packet.subarray(-16));}
+  async function packetChecksum(packet,version=2){return (await hash(concat(enc.encode('INFO-TRANSLATOR/BOOK/'+version+'/PACKET/'),packet))).subarray(0,version===3?4:16);}
+  async function validPacket(packet){const version=packet[28],size=version===3?4:16;return equal(await packetChecksum(packet.subarray(0,-size),version),packet.subarray(-size));}
   async function isMessage(message){try{const parsed=inspect(message);return parsed.version===1||await validPacket(parsed.packet);}catch{return false;}}
   async function messageKey(seed,salt,version=1){
     const root=await crypto.subtle.importKey('raw',seed,'HKDF',false,['deriveKey']);
     return crypto.subtle.deriveKey({name:'HKDF',hash:'SHA-256',salt,info:enc.encode('INFO-TRANSLATOR/BOOK/'+version+'/MESSAGE')},root,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);
   }
-  async function bookCheck(seed,salt,iv){
+  async function bookCheck(seed,salt,iv,version=2){
     const root=await crypto.subtle.importKey('raw',seed,'HKDF',false,['deriveBits']);
     // A per-message, domain-separated check replaces the public, stable book ID.
-    return new Uint8Array(await crypto.subtle.deriveBits({name:'HKDF',hash:'SHA-256',salt,info:concat(enc.encode('INFO-TRANSLATOR/BOOK/2/CHECK/'),iv)},root,128));
+    return new Uint8Array(await crypto.subtle.deriveBits({name:'HKDF',hash:'SHA-256',salt,info:concat(enc.encode('INFO-TRANSLATOR/BOOK/'+version+'/CHECK/'),iv)},root,version===3?64:128));
   }
   class Book{
     constructor(seed,forward,inverse,mask,id){this.seed=seed;this.forward=forward;this.inverse=inverse;this.mask=mask;this.id=id;this.destroyed=false;}
@@ -191,16 +192,21 @@ const InformationTranslator=(()=>{
     character(value){this.ready();if(!Number.isInteger(value)||value<0||value>0xFFFFFF||(value^this.mask)>=COUNT)fail('密文中有无效字码');return String.fromCodePoint(fromIndex(this.inverse[value^this.mask]));}
     async export(name){this.ready();return makeFile(this.seed,name);}
     async encode(text){
-      this.ready();const list=characters(text),data=random(Math.ceil((4+3*list.length)/64)*64);
-      new DataView(data.buffer).setUint32(0,list.length,false);let p=4;
-      for(const c of list){const n=this.value(c.codePointAt(0));data[p++]=n>>>16;data[p++]=n>>>8;data[p++]=n;}
+      // Fixed-width 21-bit codes, with eight-byte length padding. No content-dependent compression.
+      this.ready();const list=characters(text),data=random(Math.ceil((4+Math.ceil(21*list.length/8))/8)*8);
+      new DataView(data.buffer).setUint32(0,list.length,false);let p=4,value=0,bits=0;
+      for(const c of list){
+        value=(value<<21)|(this.value(c.codePointAt(0))&0x1FFFFF);bits+=21;
+        while(bits>=8){bits-=8;data[p++]=(value>>>bits)&255;}value&=(1<<bits)-1;
+      }
+      if(bits)data[p]=(value<<(8-bits))|(data[p]&((1<<(8-bits))-1));
       const salt=random(16),iv=random(12);
       try{
-        const header=concat(salt,iv,Uint8Array.of(2),await bookCheck(this.seed,salt,iv)),key=await messageKey(this.seed,salt,2);
-        const aad=concat(enc.encode('INFO-TRANSLATOR/BOOK/2/CONTENT/'),header);
+        const header=concat(salt,iv,Uint8Array.of(3),await bookCheck(this.seed,salt,iv,3)),key=await messageKey(this.seed,salt,3);
+        const aad=concat(enc.encode('INFO-TRANSLATOR/BOOK/3/CONTENT/'),header);
         const cipher=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv,additionalData:aad,tagLength:128},key,data)),packet=concat(header,cipher);
-        // The public checksum detects copy damage; GCM provides authentication.
-        return decimal(concat(packet,await packetChecksum(packet)));
+        // The short public checksum detects copy damage; the full GCM tag authenticates all content.
+        return decimal(concat(packet,await packetChecksum(packet,3)));
       }
       finally{data.fill(0);}
     }
@@ -212,13 +218,25 @@ const InformationTranslator=(()=>{
         aad=enc.encode('IB1.'+this.id);cipher=packet.subarray(28);
       }else{
         if(!await validPacket(packet))fail('内容不完整或已被改动，请重新复制完整内容');
-        if(!equal(await bookCheck(this.seed,salt,iv),packet.subarray(29,45)))fail('密码本错误');
-        aad=concat(enc.encode('INFO-TRANSLATOR/BOOK/2/CONTENT/'),packet.subarray(0,45));cipher=packet.subarray(45,-16);
+        const headerSize=parsed.version===3?37:45,checksumSize=parsed.version===3?4:16;
+        if(!equal(await bookCheck(this.seed,salt,iv,parsed.version),packet.subarray(29,headerSize)))fail('密码本错误');
+        aad=concat(enc.encode('INFO-TRANSLATOR/BOOK/'+parsed.version+'/CONTENT/'),packet.subarray(0,headerSize));cipher=packet.subarray(headerSize,-checksumSize);
       }
       const key=await messageKey(this.seed,salt,parsed.version);let data;
       try{data=new Uint8Array(await crypto.subtle.decrypt({name:'AES-GCM',iv,additionalData:aad,tagLength:128},key,cipher));}
       catch{fail('内容不完整或已被改动，请重新复制完整内容');}
       try{
+        if(parsed.version===3){
+          if(data.length<8||data.length%8!==0)fail('密文格式不正确');
+          const count=new DataView(data.buffer,data.byteOffset,data.byteLength).getUint32(0,false);
+          if(!count||count>MAX_CHARS||Math.ceil((4+Math.ceil(21*count/8))/8)*8!==data.length)fail('密文长度不正确');
+          const out=[];let p=4,value=0,bits=0;
+          for(let i=0;i<count;i++){
+            while(bits<21){value=(value<<8)|data[p++];bits+=8;}bits-=21;
+            out.push(this.character(((value>>>bits)&0x1FFFFF)|(this.mask&0xE00000)));value&=(1<<bits)-1;
+          }
+          return out.join('');
+        }
         if(data.length<64||data.length%64!==0)fail('密文格式不正确');
         const count=new DataView(data.buffer,data.byteOffset,data.byteLength).getUint32(0,false);
         if(!count||count>MAX_CHARS||Math.ceil((4+3*count)/64)*64!==data.length)fail('密文长度不正确');
