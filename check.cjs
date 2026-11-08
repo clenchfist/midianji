@@ -1,7 +1,7 @@
 'use strict';
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),assert=require('node:assert/strict'),{webcrypto,createHash}=require('node:crypto');
 const root=path.resolve(__dirname),dir=path.join(root,'dist'),html=fs.readFileSync(path.join(dir,'index.html'),'utf8');
-const allowed=['.nojekyll','apple-touch-icon.png','icon-192.png','icon-512.png','index.html','manifest.webmanifest','sw.js'].sort();
+const allowed=['.nojekyll','2','apple-touch-icon.png','icon-192.png','icon-512.png','index.html','manifest.webmanifest','sw.js'].sort();
 assert.deepEqual(fs.readdirSync(dir).sort(),allowed);
 for(const tag of ['script','style'])for(const match of html.matchAll(new RegExp('<'+tag+'[^>]*>([\\s\\S]*?)</'+tag+'>','g'))){assert(html.includes("'sha256-"+createHash('sha256').update(match[1]).digest('base64')+"'"));if(tag==='script')new vm.Script(match[1]);}
 const manifest=JSON.parse(fs.readFileSync(path.join(dir,'manifest.webmanifest'),'utf8'));assert.equal(manifest.name,'密电机');assert.equal(manifest.scope,'./');assert.equal(manifest.display,'standalone');

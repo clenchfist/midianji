@@ -1,11 +1,12 @@
 'use strict';
 const fs=require('node:fs'),path=require('node:path'),{createHash}=require('node:crypto');
-const root=path.resolve(__dirname),out=path.join(root,'dist');
+const root=path.resolve(__dirname);
 const icons=['icon-192.png','icon-512.png','apple-touch-icon.png'];
-const allowed=new Set(['index.html','manifest.webmanifest','sw.js','.nojekyll',...icons]);
+function build(sourceFile,out,appName,extra=[]){
+const allowed=new Set(['index.html','manifest.webmanifest','sw.js','.nojekyll',...icons,...extra]);
 fs.mkdirSync(out,{recursive:true});
 for(const name of fs.readdirSync(out))if(!allowed.has(name))throw Error('Unexpected file in dist: '+name);
-const source=fs.readFileSync(path.join(root,'source.html'),'utf8').replace(/\r\n/g,'\n');
+const source=fs.readFileSync(path.join(root,sourceFile),'utf8').replace(/\r\n/g,'\n');
 const bootstrap=`'use strict';
 (()=>{
   if(!/^https?:$/.test(location.protocol))return;
@@ -18,14 +19,14 @@ const bootstrap=`'use strict';
     .then(()=>navigator.serviceWorker.ready).then(()=>label('可离线使用'))
     .catch(()=>label(controlled?'可离线使用':'离线准备未完成'));
 })();`;
-const manifest={id:'./',name:'密电机',short_name:'密电机',lang:'zh-CN',start_url:'./',scope:'./',display:'standalone',background_color:'#f5f6f8',theme_color:'#465f85',icons:[{src:'icon-192.png',sizes:'192x192',type:'image/png',purpose:'any maskable'},{src:'icon-512.png',sizes:'512x512',type:'image/png',purpose:'any maskable'}]};
+const manifest={id:'./',name:appName,short_name:appName,lang:'zh-CN',start_url:'./',scope:'./',display:'standalone',background_color:'#f5f6f8',theme_color:'#465f85',icons:[{src:'icon-192.png',sizes:'192x192',type:'image/png',purpose:'any maskable'},{src:'icon-512.png',sizes:'512x512',type:'image/png',purpose:'any maskable'}]};
 const manifestText=JSON.stringify(manifest,null,2);
-let html=source.replace('</head>','<meta name="theme-color" content="#465f85"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="密电机"><link rel="manifest" href="./manifest.webmanifest"><link rel="apple-touch-icon" href="./apple-touch-icon.png">\n</head>')
+let html=source.replace('</head>','<meta name="theme-color" content="#465f85"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="'+appName+'"><link rel="manifest" href="./manifest.webmanifest"><link rel="apple-touch-icon" href="./apple-touch-icon.png">\n</head>')
   .replace('</body>','<script>'+bootstrap+'</script>\n</body>');
 const hashes=tag=>[...html.matchAll(new RegExp('<'+tag+'[^>]*>([\\s\\S]*?)</'+tag+'>','g'))].map(match=>"'sha256-"+createHash('sha256').update(match[1]).digest('base64')+"'").join(' ');
 const csp="default-src 'none'; script-src "+hashes('script')+"; style-src "+hashes('style')+"; img-src data: 'self'; manifest-src 'self'; worker-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'";
 html=html.replace(/(<meta http-equiv="Content-Security-Policy" content=")[^"]*(">)/,(_,start,end)=>start+csp+end);
-const digest=createHash('sha256').update(html).update(manifestText);
+const digest=createHash('sha256').update(html).update(manifestText).update('isolated-navigation-v2');
 for(const icon of icons)digest.update(fs.readFileSync(path.join(root,icon)));
 const version=digest.digest('hex').slice(0,16);
 const worker=`'use strict';
@@ -40,6 +41,7 @@ self.addEventListener('fetch',event=>{
   const request=event.request,url=new URL(request.url);
   if(request.method!=='GET'||url.origin!==BASE.origin||!url.pathname.startsWith(BASE.pathname))return;
   if(request.mode==='navigate'){
+    if(url.pathname!==BASE.pathname&&url.pathname!==new URL(INDEX).pathname)return;
     event.respondWith((async()=>{
       const cache=await caches.open(CACHE),controller=new AbortController();
       const timeout=setTimeout(()=>controller.abort(),4000);
@@ -54,3 +56,6 @@ self.addEventListener('fetch',event=>{
 fs.writeFileSync(path.join(out,'index.html'),html);fs.writeFileSync(path.join(out,'manifest.webmanifest'),manifestText);fs.writeFileSync(path.join(out,'sw.js'),worker);fs.writeFileSync(path.join(out,'.nojekyll'),'');
 for(const icon of icons)fs.copyFileSync(path.join(root,icon),path.join(out,icon));
 console.log(JSON.stringify({built:'dist',version,files:fs.readdirSync(out).length}));
+}
+build('source.html',path.join(root,'dist'),'密电机',['2']);
+build('source2.html',path.join(root,'dist/2'),'密电机2号');

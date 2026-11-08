@@ -1,5 +1,5 @@
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
-const source=fs.readFileSync(__dirname+'/source.html','utf8');
+const source=fs.readFileSync(__dirname+'/'+(process.argv[2]||'source.html'),'utf8');
 const app=[...source.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)][1][1];
 function setup(){
   const elements=new Map(),timers=new Map(),events=[],writes=[],downloads=[],blobs=new Map();let sequence=0;
@@ -133,6 +133,6 @@ async function test(name,fn){await fn();passed++;console.log('PASS '+name);}
 
   const html=source;
   assert(!html.includes('转译'));assert(html.includes('id="encode">信息加密</button>'));assert(html.includes('id="decode">密文翻译</button>'));
-  assert(html.includes('<h1>密电机</h1>'));assert(!html.match(/<input[^>]*id="book-file"[^>]*>/)[0].includes('accept='));assert(!html.includes('。'));
+  assert(/<h1>密电机(?:2号)?<\/h1>/.test(html));assert(!html.match(/<input[^>]*id="book-file"[^>]*>/)[0].includes('accept='));assert(!html.includes('。'));
   console.log(JSON.stringify({passed,visibleTerminologyUpdated:true}));
 })().catch(error=>{console.error(error);process.exitCode=1;});
