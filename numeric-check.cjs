@@ -13,13 +13,14 @@ assert(two.includes("STORAGE_KEY='information-translator.books2'"));assert(!one.
 assert.equal(JSON.parse(fs.readFileSync(path.join(dir,'manifest.webmanifest'))).name,'密电机 Lite');
 function api(html,codec=false){
  let core=html.match(/<script id="translator-core">([\s\S]*?)<\/script>/)[1];
- if(codec)core=core.replace('return {Book,COUNT,MAX_CHARS','globalThis.codec={decimal,undecimal,shortDecimal,unshortDecimal,liteDecimal,unliteDecimal};return {Book,COUNT,MAX_CHARS');
+ if(codec)core=core.replace('return {Book,COUNT,MAX_CHARS','globalThis.codec={decimal,undecimal,shortDecimal,unshortDecimal,liteDecimal,unliteDecimal,hanziEncode,unhanzi};return {Book,COUNT,MAX_CHARS');
  const context=vm.createContext({crypto:webcrypto,TextEncoder,TextDecoder,btoa,atob,Uint8Array,Uint32Array,DataView,BigInt});vm.runInContext(core+';globalThis.api=InformationTranslator',context);return context;
 }
 const a=api(one),b=api(two,true);
 // Public, synthetic fixtures: never use these published test seeds for real messages.
 const legacy3={"raw":"{\n  \"format\": \"INFO-TRANSLATOR-BOOK\",\n  \"v\": 1,\n  \"name\": \"公开测试用密码本，不用于真实消息\",\n  \"id\": \"cac60d623f67ecdf\",\n  \"seed\": \"AQIDBAUGBwgJCgsMDQ4PEBESExQVFhcYGRobHB0eHyA\",\n  \"checksum\": \"d912af2b674e32fda950373b08a53dbb8c9cd45f8ef557c4ab644391e130817c\"\n}","text":"旧格式兼容测试：𠮷 Hello 123\n第二行","cipher":"04748591725451639162184315175906247264451541845267520133894426070551630099748066298313809423908618800363714304333670127123063522876303358290176634309322732651486014626680315373576541039182784618816011372002247039760120964747856456347054829228933406502824525218195533279222036359201642012316115523823452608076942961555264133"};
 const legacy4={"text":"旧数字密文兼容：你好𠮷 English 123\n第二行","cipher":"067676223719195122191322802451010825428848037003531122758232043212141505972397710055025411503641091704355244200026949436350391410109039396751902527815456680098951212640760905221886390040189845411443222581639373538413893104958321800"};
+const legacy5={"text":"旧 Lite 数字密文兼容：𠮷 Hello 123\n第二行","cipher":"11776479907021211366948595406017340385578371762063970092290946558862880092161230935881212730382951705803331431354052655561998558495720050799682392189313945094323720000035"};
 let passed=0;
 async function test(name,fn){await fn();passed++;console.log('PASS '+name);}
 (async()=>{
@@ -28,18 +29,35 @@ async function test(name,fn){await fn();passed++;console.log('PASS '+name);}
   for(const n of [1,2,3,36,37,38,52536]){const bytes=new Uint8Array(n);webcrypto.getRandomValues(bytes);assert.deepEqual(b.codec.unshortDecimal(b.codec.shortDecimal(bytes)),bytes);}
   for(const bad of ['','5','000005','１２３４５','1e255','9'.repeat(155)+'645','0'.repeat(50)+'005'])assert.throws(()=>b.codec.unliteDecimal(bad));
  });
+
+ await test('Han encoding preserves every byte, canonical padding and all length residues',async()=>{
+  assert.equal(b.codec.hanziEncode(new Uint8Array(14)),'一'.repeat(8)+'零');
+  assert.equal(b.codec.hanziEncode(new Uint8Array(14).fill(255)),'\u8DFF'.repeat(8)+'零');
+  for(const n of [...Array.from({length:160},(_,i)=>i+13),1025,2049,52513]){
+   const bytes=new Uint8Array(n);webcrypto.getRandomValues(bytes);bytes[0]=0;bytes[1]=0;
+   const text=b.codec.hanziEncode(bytes);assert(/^[\u4E00-\u9FFF]+$/.test(text));assert.deepEqual(b.codec.unhanzi(text),bytes);
+   assert(text.length*2<=b.codec.liteDecimal(bytes).length,'Display character count must at least halve');
+  }
+  for(const bad of ['','零','一'.repeat(8)+'A','一'.repeat(7)+'丁'+'霞','一'.repeat(8)+'霞雪','一'.repeat(40000)+'零'])assert.throws(()=>b.codec.unhanzi(bad));
+  // Protocol lengths across the entire accepted packet range, independent of content.
+  for(let n=13;n<=52513;n++){
+   const tail=(n-1)%64+1,body=Math.floor((n-1)/64)*155+Math.ceil(tail*8*Math.log10(2));
+   const decimalLength=5*Math.ceil((body+3)/5),hanLength=Math.ceil(n*8/14)+1;
+   assert(hanLength*2<=decimalLength);
+  }
+ });
  const original=await a.api.Book.create(),raw=await original.export('公开兼容性测试'),book=await b.api.Book.restore(raw),restored=await b.api.Book.restore(raw),other=await b.api.Book.create();
- await test('old v2/v3/v4 numbers and original ciphertext still decrypt with unchanged book files',async()=>{
-  const legacyBook=await b.api.Book.restore(legacy3.raw);assert.equal(await legacyBook.decode(legacy3.cipher),legacy3.text);assert.equal(await legacyBook.decode(legacy4.cipher),legacy4.text);legacyBook.destroy();
+ await test('old v2/v3/v4/v5 numbers and original ciphertext still decrypt with unchanged book files',async()=>{
+  const legacyBook=await b.api.Book.restore(legacy3.raw);assert.equal(await legacyBook.decode(legacy3.cipher),legacy3.text);assert.equal(await legacyBook.decode(legacy4.cipher),legacy4.text);assert.equal(await legacyBook.decode(legacy5.cipher),legacy5.text);assert.equal(await legacyBook.decode(b.codec.hanziEncode(b.api.inspect(legacy5.cipher).packet)),legacy5.text);legacyBook.destroy();
   for(let i=0;i<30;i++){const text='原版兼容 '+i+' 𠮷',cipher=await original.encode(text);assert.equal(await book.decode(cipher),text);assert.equal(await book.decode(b.codec.decimal(Uint8Array.from(Buffer.from(cipher,'base64url')))),text);}
  });
- await test('new numbers round-trip all scripts, zeroes, BOM, newlines and combining marks; wrong book and modifications fail',async()=>{
+ await test('new Han ciphertext round-trips all scripts, zeroes, BOM, newlines and combining marks; wrong book and modifications fail',async()=>{
   const samples=['中文简体與繁體','English words 0123456789','𠮷𠀀👨‍👩‍👧‍👦 e\u0301\n换行\t空格','000001234567890','a','\uFEFFabc','\0\uFEFF你好\r\n','𠮷'.repeat(23),'12345'.repeat(30)];
-  for(const text of samples){const cipher=await book.encode(text);assert(/^\d+$/.test(cipher));assert.equal(b.api.inspect(cipher).version,5);assert.equal(await restored.decode(cipher),text);assert.equal(await book.decode(cipher.match(/.{1,17}/g).join(' \n')),text);assert(await b.api.isMessage(cipher,book));assert(!await b.api.isMessage(cipher));assert.notEqual(await book.encode(text),cipher);await assert.rejects(()=>other.decode(cipher));
+  for(const text of samples){const cipher=await book.encode(text);assert(/^[\u4E00-\u9FFF]+$/.test(cipher));assert.equal(b.api.inspect(cipher).version,6);assert.equal(await restored.decode(cipher),text);assert.equal(await book.decode(cipher.match(/.{1,17}/g).join(' \n')),text);assert(await b.api.isMessage(cipher,book));assert(!await b.api.isMessage(cipher));assert.notEqual(await book.encode(text),cipher);await assert.rejects(()=>other.decode(cipher));
    for(const removed of [1,2,5])await assert.rejects(()=>book.decode(cipher.slice(0,-removed)));
-   const packet=b.api.inspect(cipher).packet;packet[8]^=1;await assert.rejects(()=>book.decode(b.codec.liteDecimal(packet)),{message:'内容不完整或已被改动，请重新复制完整内容'});
+   const packet=b.api.inspect(cipher).packet;packet[8]^=1;await assert.rejects(()=>book.decode(b.codec.hanziEncode(packet)));await assert.rejects(()=>book.decode(b.codec.liteDecimal(packet)),{message:'内容不完整或已被改动，请重新复制完整内容'});
   }
-  assert(!await b.api.isMessage('0'.repeat(52)+'135',book));assert(!await b.api.isMessage('12345678901234567890',book));
+  assert(!await b.api.isMessage('0'.repeat(52)+'135',book));assert(!await b.api.isMessage('12345678901234567890',book));assert(!await b.api.isMessage('今天我们一起开心出行'.repeat(8)+'雨',book));
  });
  const seed=Buffer.from(JSON.parse(raw).seed,'base64url');
  const material=nonce=>Buffer.from(hkdfSync('sha256',seed,nonce,Buffer.from('INFO-TRANSLATOR/LITE/5/KEYS'),48));
@@ -72,12 +90,12 @@ async function test(name,fn){await fn();passed++;console.log('PASS '+name);}
   const nonces=new Set(),messages=new Set();for(let i=0;i<100;i++){const message=await book.encode('每次随机');messages.add(message);nonces.add(Buffer.from(b.api.inspect(message).packet.subarray(0,6)).toString('hex'));}assert.equal(messages.size,100);assert.equal(nonces.size,100);
  });
  await test('measured short and repeated messages are shorter without inflating incompressible text',async()=>{
-  const examples=[{text:'你好',before:101,after:45},{text:'今晚八点老地方见',before:131,after:75},{text:'明天上午十点在图书馆门口见面，带上上次讨论的资料。如果临时有变化，请提前告诉我。',before:291,after:230},{text:'周末我们去郊外走走吧，看看天气再决定出发时间。记得带水、雨伞和充电器。到时候一起吃午饭，下午再慢慢回来。'.repeat(4),before:1131,after:320}];
-  for(const example of examples){const cipher=await book.encode(example.text);assert.equal(cipher.length,example.after);assert(cipher.length<example.before);assert.equal(await book.decode(cipher),example.text);}
-  console.log(JSON.stringify({lengthExamples:examples.map(x=>({characters:[...x.text].length,oldDigits:x.before,newDigits:x.after}))}));
+  const examples=[{"text": "你好", "before": 45, "after": 11}, {"text": "今晚八点老地方见", "before": 75, "after": 18}, {"text": "明天上午十点在图书馆门口见面，带上上次讨论的资料。如果临时有变化，请提前告诉我。", "before": 230, "after": 55}, {"text": "周末我们去郊外走走吧，看看天气再决定出发时间。记得带水、雨伞和充电器。到时候一起吃午饭，下午再慢慢回来。周末我们去郊外走走吧，看看天气再决定出发时间。记得带水、雨伞和充电器。到时候一起吃午饭，下午再慢慢回来。周末我们去郊外走走吧，看看天气再决定出发时间。记得带水、雨伞和充电器。到时候一起吃午饭，下午再慢慢回来。周末我们去郊外走走吧，看看天气再决定出发时间。记得带水、雨伞和充电器。到时候一起吃午饭，下午再慢慢回来。", "before": 320, "after": 75}];
+  for(const example of examples){const cipher=await book.encode(example.text);assert.equal(cipher.length,example.after);assert(cipher.length*2<=example.before);assert.equal(b.codec.liteDecimal(b.api.inspect(cipher).packet).length,example.before);assert.equal(await book.decode(cipher),example.text);}
+  console.log(JSON.stringify({lengthExamples:examples.map(x=>({characters:[...x.text].length,oldDigits:x.before,newHanzi:x.after}))}));
  });
  await test('original and Lite offline workers keep their navigation caches separate',async()=>{
   for(const child of [false,true]){const pathname=child?'/midianji/lite/':'/midianji/',handlers={},worker=fs.readFileSync(path.join(root,'dist',child?'lite/sw.js':'sw.js'),'utf8');vm.runInNewContext(worker,{URL,self:{location:{href:'https://example.com'+pathname+'sw.js'},addEventListener:(name,fn)=>handlers[name]=fn}});let handled=false;handlers.fetch({request:{url:'https://example.com'+pathname+'unrelated/',method:'GET',mode:'navigate'},respondWith(){handled=true;}});assert(!handled);if(!child){handlers.fetch({request:{url:'https://example.com/midianji/lite/',method:'GET',mode:'navigate'},respondWith(){handled=true;}});assert(!handled);}}
  });
- original.destroy();book.destroy();other.destroy();restored.destroy();console.log(JSON.stringify({passed,format:5,entertainment:true,legacyFormatsReadable:true}));
+ original.destroy();book.destroy();other.destroy();restored.destroy();console.log(JSON.stringify({passed,format:6,entertainment:true,legacyFormatsReadable:true}));
 })().catch(error=>{console.error(error);process.exitCode=1;});

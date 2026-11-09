@@ -32,7 +32,7 @@ async function test(name,fn){await fn();passed++;console.log('PASS '+name);}
   const s=page(new Map([['information-translator.books','original app fixture']]));await s.ready();let raw,cipher;
   await test('generation works without save APIs and persists the book in the original Lite storage key',async()=>{
     await s.get('new-book').onclick();raw=JSON.parse(s.store.get(key)).files[0];assert(raw);assert.equal(s.store.get('information-translator.books'),'original app fixture');assert.equal(s.choices().length,1);
-    s.get('input').value='持久化兼容测试：𠮷 English 123\n第二行';await s.get('encode').onclick();cipher=s.get('output').value;assert(/^\d+$/.test(cipher));
+    s.get('input').value='持久化兼容测试：𠮷 English 123\n第二行';await s.get('encode').onclick();cipher=s.get('output').value;assert(/^[\u4E00-\u9FFF]+$/.test(cipher));
   });
   const restored=page(s.store);await restored.ready();
   await test('reload restores old-format records without another file import and lets users choose manually',async()=>{
@@ -76,5 +76,5 @@ async function test(name,fn){await fn();passed++;console.log('PASS '+name);}
     await new Promise(setImmediate);assert.deepEqual(deleted,[keys[0]]);assert.deepEqual(unregistered,['https://example.com/midianji/2/']);
     const worker=fs.readFileSync(__dirname+'/dist/2/sw.js','utf8');new vm.Script(worker);assert(worker.includes('status:410'));assert(worker.includes('self.registration.unregister()'));
   });
-  s.listeners.pagehide();restored.listeners.pagehide();console.log(JSON.stringify({passed,persistentBrowserBooks:true,numericFormat:5,oldRouteRetired:true}));
+  s.listeners.pagehide();restored.listeners.pagehide();console.log(JSON.stringify({passed,persistentBrowserBooks:true,hanziFormat:6,oldRouteRetired:true}));
 })().catch(error=>{console.error(error);process.exitCode=1;});

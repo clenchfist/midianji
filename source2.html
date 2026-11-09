@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="description" content="密电机 Lite，纯数字密文，密码本保存在当前浏览器">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-LcBw2hW+YYdj4cRNSLw/7UsXFb9VYmSZsd+XheDAZoE=' 'sha256-0dvz8EzBO4baX9qwCwi4OCq4uq6AjOjKQZyKU5Ft0+I='; style-src 'sha256-KvsH/IB7GmYY7esryMc6m9qbB9NIFhNLqNADqSBDT/Y='; img-src data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'"><meta name="referrer" content="no-referrer">
+<meta name="description" content="密电机 Lite，精简汉字密文，密码本保存在当前浏览器">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-nSddToPFtFJ0iJSLcyktHW5cfYKSBCqbvB7zcIhrAtM=' 'sha256-0dvz8EzBO4baX9qwCwi4OCq4uq6AjOjKQZyKU5Ft0+I='; style-src 'sha256-KvsH/IB7GmYY7esryMc6m9qbB9NIFhNLqNADqSBDT/Y='; img-src data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'"><meta name="referrer" content="no-referrer">
 <title>密电机 Lite</title><style>:root{color-scheme:light;--ink:#2b3844;--muted:#707d89;--line:#d3dae1;--accent:#506982;font-family:"SimSun","宋体","Songti SC",STSong,serif;font-synthesis:none}
 *{box-sizing:border-box}body{margin:0;background:#f2f4f6;color:var(--ink);font-size:15px;line-height:1.5}button,input,textarea,select{font:inherit}button{cursor:pointer}button:disabled{cursor:default;opacity:.43}button,input,textarea,summary{outline-offset:3px}button:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-visible{outline:2px solid #7992a9}.hidden{display:none!important}
 .app{width:min(100%,1368px);height:100dvh;min-height:520px;margin:0 auto;padding:12px 24px 8px;display:flex;flex-direction:column;gap:12px}.header{display:flex;align-items:center;flex:none;height:30px}.identity{display:flex;align-items:center;gap:14px}.app-icon{display:grid;place-items:center;width:28px;height:28px;border-radius:7px;color:#587088;background:#dfe7ef;font-size:24px;line-height:1}h1{font-size:21px;font-weight:600;margin:0}.credentials{flex:none;background:#f1efeb;border:1px solid #d8d1c7;border-radius:10px;padding:8px 16px 12px}.credential-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:7px}.field-heading{font-size:17px;font-weight:600;color:#43596f}.book-row{display:flex;align-items:center;justify-content:space-between;gap:12px 16px;flex-wrap:wrap}.book-picker{position:relative;flex:0 1 auto;width:280px;max-width:100%;min-width:0}.book-select{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;height:34px;padding:3px 12px;border:1px solid #bccaD8;background:#fbfcfe;border-radius:6px;color:var(--ink);font-size:15px;text-align:left}.book-select #book-selected-name{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.book-caret{display:grid;place-items:center;flex:0 0 20px;width:20px;height:20px;color:#677a8c;line-height:0}.book-caret svg{display:block;width:18px;height:18px}.book-select[aria-expanded=true] .book-caret{transform:rotate(180deg)}.book-list{position:absolute;z-index:20;top:calc(100% + 5px);left:0;width:max(100%,280px);max-width:calc(100vw - 64px);max-height:260px;overflow:auto;border:1px solid #bccad8;background:#fff;border-radius:7px;padding:5px;box-shadow:0 6px 20px #27303e18}.book-item{display:flex;align-items:center;gap:8px;border-radius:4px;padding:3px 5px}.book-item:hover{background:#f5f7fa}.book-item.is-current{background:#edf2f8}.book-choice{flex:1;min-width:0;background:transparent;border:0;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:7px 5px;font-size:15px;color:var(--ink)}.book-remove{flex-shrink:0;border:1px solid #a5635c;border-radius:4px;background:#a5635c;color:#fff;padding:3px 9px;font-size:14px}.book-remove:hover{background:#8f514a}.book-actions{display:flex;gap:8px;flex:none}.book-actions .button{height:34px;padding:3px 12px}.book-actions #new-book{width:144px;background:#506982;border-color:#506982;color:#fff}.book-actions #import-book{width:116px;background:#e2ece6;border-color:#c1d3c9;color:#3f5d4d}.book-actions #rename-book{width:88px;background:#e9e5ef;border-color:#d3c9de;color:#665778}
@@ -158,6 +158,7 @@ const InformationTranslator=(()=>{
   function inspect(message){
     if(typeof message!=='string'||message.length>200000)fail('内容过长，请检查是否复制了其他文字');
     const compact=message.replace(/\s/g,'');
+    if(compact.length>1&&HAN_TAILS.includes(compact.at(-1))&&/^[\u4E00-\u9FFF]+$/.test(compact))return {version:6,packet:unhanzi(compact)};
     if(/^[0-9]+$/.test(compact)&&compact.length%5===0&&compact.at(-1)==='5')return {version:5,packet:unliteDecimal(compact)};
     if(/^[0-9]+$/.test(compact)&&[1,4].includes(compact.length%5)){
       const packet=unshortDecimal(compact);
@@ -180,7 +181,7 @@ const InformationTranslator=(()=>{
   }
   async function packetChecksum(packet,version=2){return (await hash(concat(enc.encode('INFO-TRANSLATOR/BOOK/'+version+'/PACKET/'),packet))).subarray(0,version===4?2:version===3?4:16);}
   async function validPacket(packet,version=packet[28]){const size=version===4?2:version===3?4:16;return equal(await packetChecksum(packet.subarray(0,-size),version),packet.subarray(-size));}
-  async function isMessage(message,book){try{const parsed=inspect(message);if(parsed.version===5){if(!book)return false;await decodeLite.call(book,parsed.packet);return true;}return parsed.version===1||await validPacket(parsed.packet,parsed.version);}catch{return false;}}
+  async function isMessage(message,book){try{const parsed=inspect(message);if((parsed.version===5||parsed.version===6)){if(!book)return false;await decodeLite.call(book,parsed.packet);return true;}return parsed.version===1||await validPacket(parsed.packet,parsed.version);}catch{return false;}}
   async function messageKey(seed,salt,version=1){
     const root=await crypto.subtle.importKey('raw',seed,'HKDF',false,['deriveKey']);
     return crypto.subtle.deriveKey({name:'HKDF',hash:'SHA-256',salt,info:enc.encode('INFO-TRANSLATOR/BOOK/'+version+'/MESSAGE')},root,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);
@@ -197,6 +198,30 @@ const InformationTranslator=(()=>{
   // Entertainment format v5: compact decimal, optional DEFLATE, AES-128-CTR,
   // HKDF-separated keys and an encrypt-then-MAC 32-bit HMAC-SHA-256 tag.
   // The 48-bit nonce and short tag are for casual entertainment, not high-volume secure messaging.
+  // v6 changes only the display encoding of the authenticated v5 packet.
+  // Fourteen bits per BMP Han character; one Han trailer preserves exact byte length.
+  const HAN_START=0x4E00,HAN_END=HAN_START+0x3FFF,HAN_TAILS='零雪风雨雷雾霞';
+  function hanziEncode(bytes){
+    const out=[];let value=0,bits=0;
+    for(const byte of bytes){value=(value<<8)|byte;bits+=8;if(bits>=14){bits-=14;out.push(String.fromCharCode(HAN_START+((value>>>bits)&0x3FFF)));value&=(1<<bits)-1;}}
+    if(bits)out.push(String.fromCharCode(HAN_START+(value<<(14-bits))));
+    out.push(HAN_TAILS[bytes.length%7]);return out.join('');
+  }
+  function unhanzi(text){
+    const remainder=HAN_TAILS.indexOf(text.at(-1));
+    if(text.length<2||remainder<0)fail('汉字密文不完整，请重新复制');
+    const count=text.length-1,padding=(14-(remainder*8)%14)%14,size=(count*14-padding)/8;
+    if(!Number.isInteger(size)||size<13||size>52513)fail('汉字密文长度不正确');
+    const packet=new Uint8Array(size);let value=0,bits=0,p=0;
+    for(let i=0;i<count;i++){
+      const code=text.charCodeAt(i);if(code<HAN_START||code>HAN_END)fail('汉字密文格式不正确，请重新复制');
+      value=(value<<14)|(code-HAN_START);bits+=14;
+      while(bits>=8){bits-=8;const byte=(value>>>bits)&255;if(p<size)packet[p]=byte;else if(byte)fail('汉字密文格式不正确，请重新复制');p++;}
+      value&=(1<<bits)-1;
+    }
+    if(value||hanziEncode(packet)!==text)fail('汉字密文格式不正确，请重新复制');return packet;
+  }
+
   function liteDecimal(bytes){
     const parts=[];let last=0;
     for(let p=0;p<bytes.length;p+=64){const chunk=bytes.subarray(p,p+64);last=chunk.length;let value=0n;for(const byte of chunk)value=(value<<8n)|BigInt(byte);parts.push(value.toString().padStart(Math.ceil(chunk.length*8*Math.log10(2)),'0'));}
@@ -277,7 +302,7 @@ const InformationTranslator=(()=>{
       const keys=await liteKeys(this.seed,nonce),counter=new Uint8Array(16);counter.set(nonce);
       const header=concat(nonce,await liteMac(keys.mac,'CHECK',nonce,2));
       const cipher=new Uint8Array(await crypto.subtle.encrypt({name:'AES-CTR',counter,length:64},keys.cipher,data)),packet=concat(header,cipher);
-      return liteDecimal(concat(packet,await liteMac(keys.mac,'PACKET',packet,4)));
+      return hanziEncode(concat(packet,await liteMac(keys.mac,'PACKET',packet,4)));
     }finally{data.fill(0);}
   }
   async function decodeLite(packet){
@@ -316,7 +341,7 @@ const InformationTranslator=(()=>{
     async encode(text){return encodeLite.call(this,text);}
     async decode(message){
       this.ready();const parsed=inspect(message);
-      if(parsed.version===5)return decodeLite.call(this,parsed.packet);
+      if((parsed.version===5||parsed.version===6))return decodeLite.call(this,parsed.packet);
       if(parsed.version===4)return this.decodeShort(parsed.packet);
       const packet=parsed.packet,salt=packet.subarray(0,16),iv=packet.subarray(16,28);let aad,cipher;
       if(parsed.version===1){
