@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="description" content="密电机，本机生成密码本，手动导入后加密与解密">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-YJncQ8f+WqS+ONd/rw+uh2j2kxCsMNdO9bWqlVdfqOo=' 'sha256-f8xuA6YrLn7zpid2AvLTSZsBuCB3u0G24S/GHnatcYo='; style-src 'sha256-SJ6hSmFTE5DazhpHiEEmBxCvJfZleYy6F5yFt+p9MVg='; img-src data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'"><meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-YJncQ8f+WqS+ONd/rw+uh2j2kxCsMNdO9bWqlVdfqOo=' 'sha256-Ctp+CVfm7JUxiCXqqwMwQLOwyCCcbTBkzvl3XgwTnic='; style-src 'sha256-m3ui7M8Co77iC1oR6YauScgSjWDd8x5idGy0BXKiX0g='; img-src data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'"><meta name="referrer" content="no-referrer">
 <title>密电机</title><style>:root{color-scheme:light;--ink:#2b3844;--muted:#707d89;--line:#d3dae1;--accent:#506982;font-family:"SimSun","宋体","Songti SC",STSong,serif;font-synthesis:none}
 *{box-sizing:border-box}body{margin:0;background:#f2f4f6;color:var(--ink);font-size:15px;line-height:1.5}button,input,textarea,select{font:inherit}button{cursor:pointer}button:disabled{cursor:default;opacity:.43}button,input,textarea,summary{outline-offset:3px}button:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-visible{outline:2px solid #7992a9}.hidden{display:none!important}
 .app{width:min(100%,1368px);height:100dvh;min-height:520px;margin:0 auto;padding:12px 24px 8px;display:flex;flex-direction:column;gap:12px}.header{display:flex;align-items:center;flex:none;height:30px}.identity{display:flex;align-items:center;gap:14px}.app-icon{display:grid;place-items:center;width:28px;height:28px;border-radius:7px;color:#587088;background:#dfe7ef;font-size:24px;line-height:1}h1{font-size:21px;font-weight:600;margin:0}.credentials{flex:none;background:#f1efeb;border:1px solid #d8d1c7;border-radius:10px;padding:8px 16px 12px}.credential-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:7px}.field-heading{font-size:17px;font-weight:600;color:#43596f}.book-row{display:flex;align-items:center;justify-content:space-between;gap:12px 16px;flex-wrap:wrap}.book-picker{position:relative;flex:0 1 auto;width:280px;max-width:100%;min-width:0}.book-select{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;height:34px;padding:3px 12px;border:1px solid #bccaD8;background:#fbfcfe;border-radius:6px;color:var(--ink);font-size:15px;text-align:left}.book-select #book-selected-name{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.book-caret{display:grid;place-items:center;flex:0 0 20px;width:20px;height:20px;color:#677a8c;line-height:0}.book-caret svg{display:block;width:18px;height:18px}.book-select[aria-expanded=true] .book-caret{transform:rotate(180deg)}.book-list{position:absolute;z-index:20;top:calc(100% + 5px);left:0;width:max(100%,280px);max-width:calc(100vw - 64px);max-height:260px;overflow:auto;border:1px solid #bccad8;background:#fff;border-radius:7px;padding:5px;box-shadow:0 6px 20px #27303e18}.book-item{display:flex;align-items:center;gap:8px;border-radius:4px;padding:3px 5px}.book-item:hover{background:#f5f7fa}.book-item.is-current{background:#edf2f8}.book-choice{flex:1;min-width:0;background:transparent;border:0;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:7px 5px;font-size:15px;color:var(--ink)}.book-remove{flex-shrink:0;border:1px solid #a5635c;border-radius:4px;background:#a5635c;color:#fff;padding:3px 9px;font-size:14px}.book-remove:hover{background:#8f514a}.book-actions{display:flex;gap:8px;flex:none}.book-actions .button{height:34px;padding:3px 12px}.book-actions #new-book{width:144px;background:#506982;border-color:#506982;color:#fff}.book-actions #import-book{width:116px;background:#e2ece6;border-color:#c1d3c9;color:#3f5d4d}.book-actions #rename-book{width:88px;background:#e9e5ef;border-color:#d3c9de;color:#665778}
@@ -11,7 +11,7 @@ dialog{width:min(440px,calc(100vw - 32px));max-height:calc(100dvh - 32px);overfl
 @media(max-height:620px) and (min-width:761px){.app{gap:8px;padding-top:8px;padding-bottom:6px}.header{height:28px}.credentials{padding-top:6px;padding-bottom:8px}.panel-actions{height:50px}.panel-heading{height:36px}.help-body{font-size:14px;line-height:19px}}
 @media(max-width:760px){.app{height:auto;min-height:100dvh;padding:14px 16px 10px;gap:12px}.editor-grid{grid-template-columns:1fr;gap:14px;flex:none}.panel{min-height:320px}.panel textarea{height:230px;flex:none}.book-picker{width:100%!important}.book-actions{width:100%;display:grid;grid-template-columns:1.4fr 1.15fr .85fr;gap:8px}.book-actions .button{width:100%!important;padding:3px 6px}.book-list{max-width:calc(100vw - 64px)}.credentials{padding:9px 12px 12px}.panel-actions{gap:8px}.panel-actions .button{padding:3px 5px}.rename-row{flex-wrap:wrap}.rename-row label{width:100%}.rename-row input{width:120px}.help-body{padding-left:14px}footer{flex-wrap:wrap;gap:3px 12px}}
 @media(pointer:coarse){.button,.book-select,.book-choice,.help summary{min-height:44px}.book-actions .button{height:44px}.panel-actions{height:64px}.book-remove{min-height:36px}.credential-heading{margin-bottom:9px}.rename-row input,.save-name{font-size:16px}}
-.file-caption{margin-top:8px;overflow-wrap:anywhere}dialog .save-note{margin-top:12px;font-size:14px;color:#78818c}dialog .save-state{margin-top:12px;min-height:24px;color:#486655}.dialog-actions .button{max-width:100%;white-space:normal;height:auto;min-height:32px}#portable-dialog .dialog-actions{gap:8px}#portable-dialog .save-name{font-size:16px}
+.file-caption{margin-top:8px;overflow-wrap:anywhere}dialog .save-note{margin-top:12px;font-size:14px;color:#78818c}dialog .save-state{margin-top:12px;min-height:24px;color:#486655}.dialog-actions .button{max-width:100%;white-space:normal;height:auto;min-height:32px}#portable-dialog .dialog-actions{gap:8px}#portable-dialog .save-name{font-size:16px}.compat-download{margin-top:14px;border:1px solid #d9d2c7;border-radius:6px;padding:9px 10px;background:#faf8f4}.compat-download summary{cursor:pointer;color:#6e6252}.compat-download p{margin-top:8px;font-size:14px}.download-consent{display:flex;align-items:flex-start;gap:7px;font-size:14px;line-height:21px;margin:10px 0}.download-consent input{flex:none;width:16px;height:16px;margin-top:3px}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
 </style></head><body>
 <main class="app">
@@ -46,7 +46,7 @@ dialog{width:min(440px,calc(100vw - 32px));max-height:calc(100dvh - 32px);overfl
 <dialog id="save-dialog" aria-labelledby="save-title" aria-describedby="save-description"><h2 id="save-title">保存文本</h2><p id="save-description"></p><label class="save-label" for="save-name">文件名</label><input class="save-name" id="save-name" maxlength="120" autocomplete="off"><div class="dialog-actions"><button class="button neutral" id="cancel-save" type="button">取消</button><button class="button hidden" id="share-file" type="button">选择保存方式</button><button class="button primary" id="save-download" type="button">下载文件</button></div></dialog>
 <dialog id="delete-dialog" aria-labelledby="delete-title"><h2 id="delete-title">删除记录</h2><p id="delete-description"></p><div class="dialog-actions"><button class="button" id="cancel-delete" type="button">取消</button><button class="button danger" id="confirm-delete" type="button">删除</button></div></dialog>
 <dialog id="legacy-dialog" aria-labelledby="legacy-title"><h2 id="legacy-title">迁移旧密码本</h2><p id="legacy-description"></p><div id="legacy-list" class="legacy-list"></div><input type="file" id="legacy-file" class="hidden" aria-label="选择旧密码本文件核对"><div class="dialog-actions"><button class="button" id="legacy-later" type="button">稍后处理</button><button class="button primary" id="legacy-clear" type="button" disabled>清除已核对的旧记录</button></div></dialog>
-<dialog id="portable-dialog" aria-labelledby="portable-title" aria-describedby="portable-description"><h2 id="portable-title">保存新密码本</h2><p id="portable-description">通过系统菜单选择“存储到文件”或“保存到文件”，保存后选回文件核对，核对成功才启用</p><label class="save-label" for="portable-name">密码本名称</label><input class="save-name" id="portable-name" maxlength="80" autocomplete="off" autocapitalize="off" autocorrect="off"><p class="file-caption hidden" id="portable-filename"></p><p class="save-note">请选择本机文件夹，iPhone／iPad 选择“我的 iPhone／iPad”，不要选择聊天或云盘；若菜单没有文件保存入口，请取消</p><p class="save-state" id="portable-state" role="status" aria-live="polite"></p><input type="file" id="portable-file" class="hidden" aria-label="选择刚保存的新密码本"><div class="dialog-actions"><button class="button neutral" id="portable-cancel" type="button">取消</button><button class="button primary" id="portable-prepare" type="button">准备密码本</button><button class="button primary hidden" id="portable-share" type="button">选择保存位置</button><button class="button hidden" id="portable-verify" type="button">选择已保存文件</button></div></dialog>
+<dialog id="portable-dialog" aria-labelledby="portable-title" aria-describedby="portable-description"><h2 id="portable-title">保存新密码本</h2><p id="portable-description">保存后选回文件核对，核对成功才启用；可用保存方式取决于浏览器</p><label class="save-label" for="portable-name">密码本名称</label><input class="save-name" id="portable-name" maxlength="80" autocomplete="off" autocapitalize="off" autocorrect="off"><p class="file-caption hidden" id="portable-filename"></p><p class="save-note">请选择本机文件夹，iPhone／iPad 选择“我的 iPhone／iPad”，不要选择聊天或云盘；若没有保存入口，可展开兼容下载方式</p><details class="compat-download hidden" id="portable-download-options"><summary>兼容下载方式</summary><p>请先在浏览器设置中确认本机下载目录，网页不能设置或检查这个目录，也不能保证每次弹出位置选择框；不接受时请取消</p><label class="download-consent"><input type="checkbox" id="portable-download-consent">我已确认本机下载目录，同意按浏览器设置保存</label><button class="button" id="portable-download" type="button" disabled>按下载目录保存</button></details><p class="save-state" id="portable-state" role="status" aria-live="polite"></p><input type="file" id="portable-file" class="hidden" aria-label="选择刚保存的新密码本"><div class="dialog-actions"><button class="button neutral" id="portable-cancel" type="button">取消</button><button class="button primary" id="portable-prepare" type="button">准备密码本</button><button class="button primary hidden" id="portable-share" type="button">选择保存位置</button><button class="button hidden" id="portable-verify" type="button">选择已保存文件</button></div></dialog>
 <script id="translator-core">'use strict';
 const InformationTranslator=(()=>{
   const COUNT=0x110000-0x800,MAX_CHARS=20000;
@@ -196,6 +196,7 @@ const InformationTranslator=(()=>{
   let legacy=null,legacyVerifyId='',epoch=0,portablePending=null;
   const active=()=>records.find(record=>record.id===activeId);
   const canChooseSave=()=>typeof window.showSaveFilePicker==='function';
+  const canChooseDirectory=()=>typeof window.showDirectoryPicker==='function';
   const sameBook=(a,b)=>a.id===b.id&&a.seed===b.seed;
   function current(token){if(token!==epoch)throw Object.assign(new Error('操作已取消'),{name:'AbortError'});}
   const status=(text,type='')=>{$('status').textContent=text;$('status').className='status '+type;};
@@ -213,9 +214,11 @@ const InformationTranslator=(()=>{
     $('legacy-open').classList.toggle('hidden',!legacy);
     $('portable-name').disabled=locked||!!portablePending;
     $('portable-prepare').disabled=locked||!!portablePending;
-    $('portable-share').disabled=locked||!portablePending;
+    $('portable-share').disabled=locked||!portablePending||!!portablePending.downloadAttempted;
     $('portable-verify').disabled=locked||!portablePending?.attempted;
     $('portable-cancel').disabled=locked;
+    $('portable-download-consent').disabled=locked||!portablePending||!!portablePending.downloadAttempted;
+    $('portable-download').disabled=locked||!portablePending||!$('portable-download-consent').checked||!!portablePending.downloadAttempted;
   }
   function closeBookMenu(focus=false){$('book-list').classList.add('hidden');$('book-select').setAttribute('aria-expanded','false');if(focus)$('book-select').focus();}
   function renderBooks(){
@@ -273,17 +276,16 @@ const InformationTranslator=(()=>{
   function pickerOptions(name,kind='book'){
     return {id:kind==='book'?'midianji-selected-book':'midianji-text',suggestedName:name,types:[{description:kind==='book'?'密码本文件':'文本文件',accept:{[kind==='book'?'application/json':'text/plain']:[kind==='book'?'.itbook':'.txt']}}]};
   }
-  const strictSaveMessage='此浏览器既不能直接选择保存位置，也不能打开系统文件保存菜单，请使用支持文件保存的浏览器；Mac 可使用 Chrome 或 Edge，此处仍可导入和加解密';
   function suggestedBookName(){return '密码本 '+new Date().toISOString().replace(/[:T]/g,'-').slice(0,19);}
   function systemBookFile(raw,name){return shareable({text:raw,type:'application/json'},name+'.itbook')||shareable({text:raw,type:'text/plain'},name+'.itbook.txt');}
-  function clearPortable(){if(portablePending){portablePending.raw='';portablePending.file=null;portablePending.shareFile=null;portablePending=null;}}
+  function clearPortable(){if(portablePending){if(portablePending.downloadUrl)URL.revokeObjectURL(portablePending.downloadUrl);portablePending.raw='';portablePending.file=null;portablePending.shareFile=null;portablePending=null;}}
   function openPortableGeneration(){
-    if(!systemBookFile('{}','密码本')){status(strictSaveMessage,'error');return false;}
-    clearPortable();$('portable-name').value=suggestedBookName();$('portable-state').textContent='填写名称并准备密码本，随后选择保存位置';
+    clearPortable();$('portable-download-consent').checked=false;$('portable-download-options').open=false;$('portable-download-options').classList.add('hidden');
+    $('portable-name').value=suggestedBookName();$('portable-state').textContent='填写名称并准备密码本，保存并核对后才启用';
     $('portable-filename').textContent='';$('portable-filename').classList.add('hidden');$('portable-prepare').classList.remove('hidden');
     $('portable-share').classList.add('hidden');$('portable-verify').classList.add('hidden');$('portable-dialog').showModal();buttons();$('portable-name').focus();return true;
   }
-  function nativeSaveUnavailable(error){return ['SecurityError','NotSupportedError'].includes(error?.name);}
+  function nativeSaveUnavailable(error){return ['SecurityError','NotSupportedError','TypeError'].includes(error?.name);}
   $('new-book').onclick=()=>{
     if(busy||savingFile)return;
     if(records.length>=200){status('当前列表最多保留 200 本密码本，请先移除记录','error');return;}
@@ -307,16 +309,31 @@ const InformationTranslator=(()=>{
       let book;
       try{
         book=await API.Book.create();current(token);const raw=await book.export(name),file=await API.Book.readFile(raw);current(token);
-        const shareFile=systemBookFile(raw,name);if(!shareFile)throw new Error('系统不能保存此密码本文件，请更换浏览器');
-        portablePending={raw,file,shareFile,attempted:false};$('portable-name').value=file.name;
-        $('portable-filename').textContent='文件名：'+shareFile.name;$('portable-filename').classList.remove('hidden');$('portable-prepare').classList.add('hidden');$('portable-share').classList.remove('hidden');
-        $('portable-state').textContent='已准备，请点击选择保存位置，在系统菜单中保存到本机文件夹';status('密码本尚未启用，请先保存并核对');
+        const shareFile=systemBookFile(raw,name),directory=canChooseDirectory();
+        portablePending={raw,file,shareFile,attempted:false,downloadAttempted:false,downloadName:file.name+'.itbook.txt',downloadUrl:''};$('portable-name').value=file.name;
+        $('portable-filename').textContent='文件名：'+(directory?file.name+'.itbook':shareFile?.name||portablePending.downloadName);$('portable-filename').classList.remove('hidden');$('portable-prepare').classList.add('hidden');
+        $('portable-share').classList.toggle('hidden',!directory&&!shareFile);$('portable-share').textContent=directory?'选择文件夹保存':'打开系统菜单';
+        $('portable-download-options').classList.remove('hidden');$('portable-download-options').open=!directory&&!shareFile;
+        $('portable-state').textContent=directory||shareFile?'密码本已准备，请选择保存方式，保存并核对后才启用':'此浏览器未开放文件夹选择或文件分享，可在确认下载目录后手动下载并核对';status('密码本尚未启用，请先保存并核对');
       }catch(error){if(token===epoch)$('portable-state').textContent=error.message;throw error;}
       finally{book?.destroy();}
     });
   };
   $('portable-share').onclick=async()=>{
-    const item=portablePending,token=epoch;if(!item||busy||savingFile)return;
+    const item=portablePending,token=epoch;if(!item||busy||savingFile||item.downloadAttempted)return;
+    if(canChooseDirectory()){
+      let choice;try{choice=window.showDirectoryPicker({id:'midianji-book-folder',mode:'readwrite'});}catch(error){$('portable-state').textContent='无法打开文件夹选择，可使用下方兼容下载方式';return;}
+      return task('请选择密码本保存文件夹',async operationToken=>{
+        try{
+          const directory=await choice;current(operationToken);const filename=item.file.name+'.itbook';
+          let exists=false;try{await directory.getFileHandle(filename);exists=true;}catch(error){if(error?.name!=='NotFoundError')throw error;}
+          current(operationToken);if(exists)throw new Error('此文件夹已有同名文件，请选择其他文件夹，不会覆盖原文件');
+          const handle=await directory.getFileHandle(filename,{create:true});current(operationToken);const saved=await writeBook(handle,item.raw,'',operationToken);await register(saved.raw,handle,operationToken);
+          clearPortable();$('portable-dialog').close();status('密码本已保存并导入','success');
+        }catch(error){if(operationToken===epoch&&portablePending===item)$('portable-state').textContent=error?.name==='AbortError'?'已取消选择文件夹':error.message;throw error;}
+      });
+    }
+    if(!item.shareFile){$('portable-state').textContent='此浏览器不支持系统文件分享，可使用下方兼容下载方式';return;}
     let operation;
     // Use a fresh click for the system sheet; do not await key generation here.
     try{operation=navigator.share({files:[item.shareFile]});}catch(error){$('portable-state').textContent='无法打开系统保存菜单，请重试或更换浏览器';return;}
@@ -324,6 +341,17 @@ const InformationTranslator=(()=>{
     try{await operation;if(token===epoch&&portablePending===item){$('portable-state').textContent='保存后，请选择刚才保存的文件核对；关闭系统菜单不代表保存成功';}}
     catch(error){if(token===epoch&&portablePending===item)$('portable-state').textContent=error?.name==='AbortError'?'保存已取消；若已保存，可选择文件核对，否则请重试':'系统保存未完成，请重试；若文件已存在，可选择文件核对';}
     finally{if(token===epoch&&portablePending===item){savingFile=false;$('portable-verify').classList.remove('hidden');buttons();}}
+  };
+  $('portable-download-consent').onchange=buttons;
+  $('portable-download').onclick=()=>{
+    const item=portablePending;if(!item||busy||savingFile||item.downloadAttempted||!$('portable-download-consent').checked)return;
+    let url='';
+    try{
+      url=URL.createObjectURL(new Blob([item.raw],{type:'application/octet-stream'}));const link=document.createElement('a');link.href=url;link.download=item.downloadName;
+      document.body.append(link);try{link.click();}finally{link.remove();}
+      item.downloadUrl=url;item.downloadAttempted=true;item.attempted=true;$('portable-filename').textContent='文件名：'+item.downloadName;
+      $('portable-verify').classList.remove('hidden');$('portable-state').textContent='已请求下载，位置由浏览器设置决定；请从该位置选回文件核对，下载请求不代表保存成功';buttons();
+    }catch(error){if(url)URL.revokeObjectURL(url);$('portable-state').textContent='浏览器未能发起下载，请重试或更换浏览器';}
   };
   $('portable-verify').onclick=()=>{if(!busy&&!savingFile&&portablePending?.attempted)$('portable-file').click();};
   $('portable-file').onchange=()=>{
@@ -339,7 +367,7 @@ const InformationTranslator=(()=>{
   };
   $('portable-cancel').onclick=()=>{if(busy||savingFile)return;$('portable-dialog').close();status('已取消生成，未启用新密码本');};
   $('portable-dialog').oncancel=event=>{if(busy||savingFile)event.preventDefault();else status('已取消生成，未启用新密码本');};
-  $('portable-dialog').onclose=()=>{clearPortable();$('portable-name').value='';$('portable-state').textContent='';$('portable-filename').textContent='';$('portable-file').value='';buttons();$('new-book').focus();};
+  $('portable-dialog').onclose=()=>{clearPortable();$('portable-name').value='';$('portable-state').textContent='';$('portable-filename').textContent='';$('portable-file').value='';$('portable-download-consent').checked=false;buttons();$('new-book').focus();};
   $('import-book').onclick=()=>{
     if(busy)return;
     if(typeof window.showOpenFilePicker!=='function'){$('book-file').click();return;}
