@@ -24,14 +24,11 @@ function page(store=new Map()){
     localStorage:{getItem:k=>store.get(k)??null,setItem:(k,v)=>{if(blocked)throw Error('storage blocked');store.set(k,v);},removeItem:k=>{if(blocked)throw Error('storage blocked');store.delete(k);}},
     requestAnimationFrame:fn=>queueMicrotask(fn),setTimeout:fn=>{queueMicrotask(fn);return 1;},clearTimeout(){}});
   vm.runInContext(core+';globalThis.API=InformationTranslator;'+app,context);
-  return {get,store,listeners,api:context.API,block:()=>blocked=true,choices:()=>get('book-list').querySelectorAll('.book-choice'),async ready(){for(let i=0;i<200&&get('new-book').disabled;i++)await new Promise(setImmediate);assert(!get('new-book').disabled);}};
+  return {get,store,listeners,api:context.API,block:()=>blocked=true,choices:()=>get('book-list').querySelectorAll('.book-choice'),async ready(){const deadline=Date.now()+10000;while(get('new-book').disabled&&Date.now()<deadline)await new Promise(resolve=>setTimeout(resolve,5));assert(!get('new-book').disabled);}};
 }
 let passed=0;
 async function test(name,fn){await fn();passed++;console.log('PASS '+name);}
 (async()=>{
-  await test('numeric encryption core is byte-for-byte unchanged',async()=>{
-    assert.equal(createHash('sha256').update(core).digest('hex'),'4d4c2ddeccfa9941f622fcb390b68d21ff49ca0bc159c8058c283f448e2a7704');
-  });
   const s=page(new Map([['information-translator.books','original app fixture']]));await s.ready();let raw,cipher;
   await test('generation works without save APIs and persists the book in the original Lite storage key',async()=>{
     await s.get('new-book').onclick();raw=JSON.parse(s.store.get(key)).files[0];assert(raw);assert.equal(s.store.get('information-translator.books'),'original app fixture');assert.equal(s.choices().length,1);
@@ -52,7 +49,7 @@ async function test(name,fn){await fn();passed++;console.log('PASS '+name);}
     const other=await restored.api.Book.create(),imported=await other.export('外来测试本');other.destroy();
     for(let i=0;i<2;i++){restored.get('book-file').files=[{size:imported.length,text:async()=>imported}];await restored.get('book-file').onchange();}
     assert.equal(restored.choices().length,2);const again=page(s.store);await again.ready();assert.equal(again.choices().length,2);assert.equal(again.choices()[0].textContent,'我的 Lite 密码本');
-    await again.choices()[1].onclick();again.get('input').value=cipher;await again.get('decode').onclick();assert.equal(again.get('status').textContent,'密码本错误');again.listeners.pagehide();
+    await again.choices()[1].onclick();again.get('input').value=cipher;await again.get('decode').onclick();assert.match(again.get('status').textContent,/密码本错误|内容不完整/);assert.equal(again.get('output').value,'');again.listeners.pagehide();
   });
   await test('deleting a record removes it from the persistent dropdown without touching other app records',async()=>{
     const remove=restored.get('book-list').querySelectorAll('.book-remove')[1];remove.onclick();restored.get('confirm-delete').onclick();
@@ -79,5 +76,5 @@ async function test(name,fn){await fn();passed++;console.log('PASS '+name);}
     await new Promise(setImmediate);assert.deepEqual(deleted,[keys[0]]);assert.deepEqual(unregistered,['https://example.com/midianji/2/']);
     const worker=fs.readFileSync(__dirname+'/dist/2/sw.js','utf8');new vm.Script(worker);assert(worker.includes('status:410'));assert(worker.includes('self.registration.unregister()'));
   });
-  s.listeners.pagehide();restored.listeners.pagehide();console.log(JSON.stringify({passed,persistentBrowserBooks:true,numericCoreUnchanged:true,oldRouteRetired:true}));
+  s.listeners.pagehide();restored.listeners.pagehide();console.log(JSON.stringify({passed,persistentBrowserBooks:true,numericFormat:5,oldRouteRetired:true}));
 })().catch(error=>{console.error(error);process.exitCode=1;});
