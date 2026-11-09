@@ -48,6 +48,11 @@ function handle(name='选择的位置.itbook',raw='',options={}){
 }
 async function importBook(s,raw=fixture(),h=null){if(h){s.window.showOpenFilePicker=async()=>[h];await s.get('import-book').onclick();}else{s.get('book-file').files=[file(raw)];await s.get('book-file').onchange();}}
 function legacyButtons(s,index=0){return s.get('legacy-list').children[index].querySelectorAll('button');}
+function enableSystemSave(s,options={}){
+  const shared=[];s.navigator.canShare=({files})=>!options.textOnly||files[0].type==='text/plain';
+  s.navigator.share=data=>{shared.push(data.files[0]);s.calls.push(['share']);return options.share?options.share(data):Promise.resolve();};return shared;
+}
+async function preparePortable(s,name='手机测试本'){s.get('new-book').onclick();s.get('portable-name').value=name;await s.get('portable-prepare').onclick();}
 let passed=0;async function test(name,fn){await fn();passed++;console.log('PASS '+name);}
 (async()=>{
   await test('startup never automatically selects or persists a keybook',async()=>{const s=setup();await tick();assert.equal(s.get('book-selected-name').textContent,'尚未选择密码本');assert.equal(s.calls.length,0);assert(s.get('book-select').disabled);});
@@ -71,7 +76,39 @@ let passed=0;async function test(name,fn){await fn();passed++;console.log('PASS 
   });
   await test('dropdown deletion removes only the current session record',async()=>{const s=setup(),h=handle('原文件.itbook',fixture());await importBook(s,null,h);const remove=s.get('book-list').querySelectorAll('button').find(b=>b.textContent==='删除');remove.onclick();s.get('confirm-delete').onclick();assert.equal(s.get('book-selected-name').textContent,'尚未选择密码本');assert.equal(h.raw,fixture());assert.equal(h.writeCount,0);assert.equal(s.storage.size,0);});
   await test('strict unsupported browsers allow import/decode but never generate or rename via download',async()=>{
-    const s=setup();s.get('new-book').onclick();assert.match(s.get('status').textContent,/Edge 或 Chrome/);assert(!s.calls.some(c=>c[0]==='create'));assert(!s.get('save-dialog').open);await importBook(s);s.get('rename-book').onclick();assert.match(s.get('status').textContent,/写回原密码本/);s.get('input').value='CIPHER:fixture:文字';await s.get('decode').onclick();assert.equal(s.get('output').value,'文字');assert.equal(s.downloads.length,0);
+    const s=setup();s.get('new-book').onclick();assert.match(s.get('status').textContent,/Chrome 或 Edge/);assert(!s.calls.some(c=>c[0]==='create'));assert(!s.get('save-dialog').open);assert(!s.get('portable-dialog').open);await importBook(s);s.get('rename-book').onclick();assert.match(s.get('status').textContent,/写回原密码本/);s.get('input').value='CIPHER:fixture:文字';await s.get('decode').onclick();assert.equal(s.get('output').value,'文字');assert.equal(s.downloads.length,0);
+  });
+  await test('mobile preparation dialog creates nothing before explicit preparation',async()=>{
+    const s=setup();enableSystemSave(s);s.get('new-book').onclick();assert(s.get('portable-dialog').open);assert(!s.calls.some(c=>c[0]==='create'));assert(s.get('portable-share').disabled);s.get('portable-cancel').onclick();assert(!s.get('portable-dialog').open);assert.equal(s.storage.size,0);assert.equal(s.downloads.length,0);
+  });
+  await test('mobile preparation stays in memory, validates names and never activates an unsaved book',async()=>{
+    const s=setup();enableSystemSave(s);s.get('new-book').onclick();s.get('portable-name').value='../bad';await s.get('portable-prepare').onclick();assert(!s.calls.some(c=>c[0]==='create'));assert.match(s.get('portable-state').textContent,/有效密码本名称/);
+    s.get('portable-name').value='我的测试本';await s.get('portable-prepare').onclick();assert.equal(s.get('book-selected-name').textContent,'尚未选择密码本');assert(s.calls.some(c=>c[0]==='destroy'));assert(!s.get('portable-share').disabled);assert(s.get('portable-verify').disabled);assert.equal(s.get('portable-filename').textContent,'文件名：我的测试本.itbook');assert.equal(s.downloads.length,0);assert.equal(s.storage.size,0);
+  });
+  await test('system sheet opens on a fresh click; completing it alone never means saved or active',async()=>{
+    const s=setup(),d=deferred();const shared=enableSystemSave(s,{share:()=>d.promise});await preparePortable(s);const pending=s.get('portable-share').onclick();assert.equal(shared.length,1,'Share must be called synchronously before awaiting anything');assert(s.get('portable-verify').disabled);assert(s.get('portable-cancel').disabled);d.resolve();await pending;assert.equal(s.get('book-selected-name').textContent,'尚未选择密码本');assert.match(s.get('portable-state').textContent,/不代表保存成功/);assert(!s.get('portable-verify').disabled);assert.equal(s.downloads.length,0);assert.equal(s.storage.size,0);
+  });
+  await test('only the actual reselected matching saved file activates a mobile book',async()=>{
+    const s=setup(),shared=enableSystemSave(s);await preparePortable(s,'手机本');await s.get('portable-share').onclick();s.get('portable-verify').onclick();s.get('portable-file').files=[file(fixture('wrong','别的本','wrong-seed'))];await s.get('portable-file').onchange();assert.equal(s.get('book-selected-name').textContent,'尚未选择密码本');assert.match(s.get('portable-state').textContent,/不是刚才生成/);
+    s.get('portable-file').files=[shared[0]];await s.get('portable-file').onchange();assert.equal(s.get('book-selected-name').textContent,'手机本');assert.equal(s.get('status').textContent,'密码本已核对并导入');assert(!s.get('portable-dialog').open);assert.equal(s.get('portable-name').value,'');assert.equal(s.downloads.length,0);assert.equal(s.storage.size,0);s.get('input').value='已落盘再启用';await s.get('encode').onclick();assert.equal(s.get('output').value,'CIPHER:fixture:已落盘再启用');
+  });
+  await test('unsupported custom extensions use a text file with identical verified keybook contents',async()=>{
+    const s=setup(),shared=enableSystemSave(s,{textOnly:true});await preparePortable(s);assert.equal(s.get('portable-filename').textContent,'文件名：手机测试本.itbook.txt');await s.get('portable-share').onclick();assert.equal(shared[0].type,'text/plain');assert.equal(JSON.parse(await shared[0].text()).name,'手机测试本');s.get('portable-file').files=[shared[0]];await s.get('portable-file').onchange();assert.equal(s.get('book-selected-name').textContent,'手机测试本');
+  });
+  await test('canceling or failing the system sheet never downloads or enables the generated book',async()=>{
+    for(const errorName of ['AbortError','NotAllowedError']){const s=setup();enableSystemSave(s,{share:async()=>{throw Object.assign(Error('failed'),{name:errorName});}});await preparePortable(s);await s.get('portable-share').onclick();assert.equal(s.get('book-selected-name').textContent,'尚未选择密码本');assert.equal(s.downloads.length,0);assert(!s.get('portable-share').disabled);s.get('portable-cancel').onclick();assert(!s.get('portable-dialog').open);assert.equal(s.get('portable-name').value,'');s.get('portable-file').files=[file(fixture())];await s.get('portable-file').onchange();assert.equal(s.get('book-selected-name').textContent,'尚未选择密码本');}
+  });
+  await test('canceling a pending mobile book preserves the current imported book',async()=>{
+    const s=setup();await importBook(s,fixture('existing','当前本','existing-seed'));enableSystemSave(s);await preparePortable(s);s.get('portable-cancel').onclick();assert.equal(s.get('book-selected-name').textContent,'当前本');assert.equal(s.get('book-list').children.length,1);
+  });
+  await test('picker security failures can offer explicit system saving; picker cancellation cannot',async()=>{
+    for(const errorName of ['SecurityError','NotSupportedError','AbortError']){const s=setup();enableSystemSave(s);s.window.showSaveFilePicker=async()=>{throw Object.assign(Error('picker unavailable'),{name:errorName});};await s.get('new-book').onclick();assert.equal(s.get('portable-dialog').open,errorName!=='AbortError');assert(!s.calls.some(c=>c[0]==='create'));assert.equal(s.downloads.length,0);}
+  });
+  await test('late system-sheet completion cannot resurrect a closed page or an unsaved book',async()=>{
+    const s=setup(),d=deferred();enableSystemSave(s,{share:()=>d.promise});await preparePortable(s);const pending=s.get('portable-share').onclick();s.events.pagehide();d.resolve();await pending;assert.equal(s.get('book-selected-name').textContent,'尚未选择密码本');assert(!s.get('portable-dialog').open);assert.equal(s.get('portable-name').value,'');assert.equal(s.get('status').textContent,'');assert.equal(s.storage.size,0);
+  });
+  await test('closing a page while preparing a mobile book discards the late result',async()=>{
+    const s=setup(),d=deferred();enableSystemSave(s);s.API.Book.create=()=>d.promise;s.get('new-book').onclick();const pending=s.get('portable-prepare').onclick();s.events.pagehide();d.resolve(s.engine(JSON.parse(fixture())));await pending;assert(!s.get('portable-dialog').open);assert.equal(s.get('portable-name').value,'');assert.equal(s.get('book-selected-name').textContent,'尚未选择密码本');assert(s.calls.some(c=>c[0]==='destroy'));
   });
   await test('wrong book is reported without switching books automatically',async()=>{const s=setup();await importBook(s);s.get('input').value='CIPHER:other:原文';await s.get('decode').onclick();assert.equal(s.get('status').textContent,'密码本错误');assert.equal(s.get('book-selected-name').textContent,'测试本');assert.equal(s.get('output').value,'');});
   await test('copy confirmation lasts exactly one second',async()=>{const s=setup();s.get('output').value='结果';await s.get('copy').onclick();assert(!s.get('copy-toast').classList.contains('hidden'));const t=[...s.timers.values()][0];assert.equal(t.ms,1000);t.fn();assert(s.get('copy-toast').classList.contains('hidden'));});
@@ -102,5 +139,5 @@ let passed=0;async function test(name,fn){await fn();passed++;console.log('PASS 
   assert(!/localStorage\.setItem|sessionStorage|indexedDB|fetch\(/.test(script));assert(!/on?scroll|requestAnimationFrame|setInterval/.test(script));
   assert(!html.includes('placeholder='));assert(!html.includes('export-book'));assert(!html.includes('转译'));assert(!html.includes('。'));
   assert.match(html,/font-family:"SimSun","宋体","Songti SC"/);assert.match(html,/line-height:21px/);assert.match(html,/padding:3px 8px/);
-  console.log(JSON.stringify({passed,sessionOnly:true,strictFileSaving:true,legacyClearedOnlyAfterVerification:true}));
+  console.log(JSON.stringify({passed,sessionOnly:true,noAutomaticBookDownload:true,mobileRequiresSavedFileVerification:true,legacyClearedOnlyAfterVerification:true}));
 })().catch(error=>{console.error(error);process.exitCode=1;});
