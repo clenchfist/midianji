@@ -6,7 +6,7 @@ function setup(){
   function element(id=''){
     const classes=new Set();return {id,value:'',textContent:'',className:'',disabled:false,dataset:{},files:[],
       classList:{add:x=>classes.add(x),remove:x=>classes.delete(x),contains:x=>classes.has(x),toggle:(x,force)=>{const add=force===undefined?!classes.has(x):force;add?classes.add(x):classes.delete(x);return add;}},
-      replaceChildren(){},querySelectorAll(){return [];},append(){},remove(){},setAttribute(){},addEventListener(){},contains(){return false;},
+      style:{},replaceChildren(){},querySelectorAll(){return [];},append(){},remove(){},setAttribute(){},addEventListener(){},contains(){return false;},
       focus(){events.push('focus:'+id);},select(){events.push('select:'+id);},click(){events.push('click:'+id);if(this.download)downloads.push({name:this.download,blob:blobs.get(this.href)});},showModal(){this.open=true;},close(){this.open=false;this.onclose?.();}};
   }
   const get=id=>{if(!elements.has(id))elements.set(id,element(id));return elements.get(id);};
@@ -132,7 +132,7 @@ async function test(name,fn){await fn();passed++;console.log('PASS '+name);}
   });
 
   const html=source;
-  assert(!html.includes('转译'));assert(html.includes('id="encode">信息加密</button>'));assert(html.includes('id="decode">密文翻译</button>'));
-  assert(/<h1>密电机(?:2号)?<\/h1>/.test(html));assert(!html.match(/<input[^>]*id="book-file"[^>]*>/)[0].includes('accept='));assert(!html.includes('。'));
+  assert(!html.includes('转译'));assert(/id="encode"[^>]*>信息加密<\/button>/.test(html));assert(/id="decode"[^>]*>密文翻译<\/button>/.test(html));
+  assert(/<h1>密电机(?: Lite)?<\/h1>/.test(html));assert(!html.match(/<input[^>]*id="book-file"[^>]*>/)[0].includes('accept='));assert(!html.includes('。'));
   console.log(JSON.stringify({passed,visibleTerminologyUpdated:true}));
 })().catch(error=>{console.error(error);process.exitCode=1;});
