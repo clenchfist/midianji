@@ -7,7 +7,7 @@ for(const file of ['source2.html','dist/lite/index.html']){
  const html=fs.readFileSync(path.join(root,file),'utf8');
  for(const tag of ['script','style'])for(const m of html.matchAll(new RegExp('<'+tag+'[^>]*>([\\s\\S]*?)</'+tag+'>','g'))){assert(html.includes("'sha256-"+createHash('sha256').update(m[1]).digest('base64')+"'"));if(tag==='script')new vm.Script(m[1]);}
 }
-assert(two.includes('<h1>密电机 Lite</h1>'));assert(one.includes('<h1>密电机</h1>'));assert(!one.includes('function liteDecimal('));assert(two.includes('<span>娱乐用途</span>'));
+assert(two.includes('<h1>密电机 Lite</h1>'));assert(one.includes('<h1>密电机</h1>'));assert(!one.includes('function liteDecimal('));assert(!two.includes('<span>娱乐用途</span>'));
 assert.equal(two.match(/<div class="help-body">([\s\S]*?)<\/div><\/details>/)[1],one.match(/<div class="help-body">([\s\S]*?)<\/div><\/details>/)[1]);
 assert(two.includes("STORAGE_KEY='information-translator.books2'"));assert(!one.includes('localStorage.setItem'));
 assert.equal(JSON.parse(fs.readFileSync(path.join(dir,'manifest.webmanifest'))).name,'密电机 Lite');
